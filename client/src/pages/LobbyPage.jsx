@@ -35,6 +35,9 @@ const LobbyPage = () => {
 
     socket.on('room:state', (data) => {
       setPlayers(data.players);
+      if (data.maxPlayers) {
+        setRoom((prev) => prev ? { ...prev, maxPlayers: data.maxPlayers, gameType: data.gameType || prev.gameType } : prev);
+      }
     });
 
     socket.on('room:player-joined', (data) => {
