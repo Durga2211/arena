@@ -1,0 +1,358 @@
+/* ═══════════════════════════════════════════════
+   MINES GAME THEME - NORMAL UI
+   ═══════════════════════════════════════════════ */
+
+.mines-container {
+  display: flex;
+  min-height: calc(100vh - 72px); /* Account for navbar */
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-family-base);
+  overflow: hidden;
+  background-image: 
+    radial-gradient(circle at 50% 50%, var(--bg-surface) 0%, var(--bg-primary) 100%),
+    linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 40px 40px, 40px 40px;
+  background-position: center center;
+}
+
+/* ═══════════════════════════════════════════════
+   MAIN CENTER PANEL (GRID)
+   ═══════════════════════════════════════════════ */
+.mines-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  position: relative;
+}
+
+.mines-grid-wrapper {
+  perspective: 1000px;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.mines-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  padding: 20px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  transform-style: preserve-3d;
+  transform: rotateX(5deg);
+  transition: transform var(--transition-base);
+}
+
+.mines-grid:hover {
+  transform: rotateX(0deg);
+}
+
+.mine-tile {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(1.2rem, 4vw, 2rem);
+}
+
+.mine-tile:hover:not(.revealed):not(.disabled) {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: var(--shadow-md);
+  border-color: var(--text-tertiary);
+}
+
+.mine-tile:active:not(.revealed):not(.disabled) {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: inset 2px 2px 5px rgba(0,0,0,0.1);
+}
+
+/* REVEALED STATES */
+.mine-tile.revealed {
+  cursor: default;
+  transform: scale(0.95);
+  box-shadow: inset 3px 3px 8px rgba(0,0,0,0.05);
+}
+
+.mine-tile.revealed.gem {
+  background: rgba(0, 204, 102, 0.1);
+  border-color: rgba(0, 204, 102, 0.4);
+  box-shadow: 0 0 15px rgba(0, 204, 102, 0.1), inset 0 0 10px rgba(0, 204, 102, 0.05);
+  animation: pulseGem 2s infinite alternate;
+}
+
+.mine-tile.revealed.mine {
+  background: rgba(201, 42, 42, 0.1);
+  border-color: var(--primary);
+  box-shadow: 0 0 15px rgba(201, 42, 42, 0.2), inset 0 0 10px rgba(201, 42, 42, 0.1);
+  animation: shakeBomb 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.mine-tile.disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* ═══════════════════════════════════════════════
+   SIDEBAR DASHBOARD
+   ═══════════════════════════════════════════════ */
+.mines-sidebar {
+  width: 380px;
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border-default);
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-xl) var(--space-lg);
+  box-shadow: var(--shadow-md);
+  z-index: 10;
+}
+
+.sidebar-header {
+  text-align: center;
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.sidebar-header h2 {
+  font-family: var(--font-family-display);
+  font-size: var(--font-2xl);
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-xs) 0;
+}
+
+/* TIMER RING */
+.timer-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-lg);
+}
+
+.timer-circle {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: conic-gradient(var(--timer-color) var(--timer-deg), var(--border-default) 0deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  transition: all 1s linear;
+}
+
+.timer-circle::before {
+  content: '';
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  background: var(--bg-surface);
+  border-radius: 50%;
+}
+
+.timer-text {
+  position: relative;
+  font-family: var(--font-family-display);
+  font-size: var(--font-2xl);
+  font-weight: 800;
+  color: var(--text-primary);
+  z-index: 2;
+}
+
+/* LEADERBOARD */
+.leaderboard-container {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.leaderboard-container::-webkit-scrollbar {
+  width: 6px;
+}
+.leaderboard-container::-webkit-scrollbar-thumb {
+  background: var(--border-hover);
+  border-radius: 10px;
+}
+
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.leaderboard-item.me {
+  border-color: var(--primary);
+  background: var(--primary-glow);
+}
+
+.leaderboard-item.eliminated {
+  opacity: 0.6;
+}
+
+.player-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.player-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--border-hover);
+  object-fit: cover;
+}
+
+.player-name {
+  font-weight: 600;
+  font-size: var(--font-sm);
+  color: var(--text-primary);
+}
+
+.player-status {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+.status-digging { color: var(--info); }
+.status-eliminated { color: var(--danger); }
+.status-survived { color: var(--success); }
+
+.player-gems {
+  font-family: var(--font-family-display);
+  font-size: var(--font-lg);
+  font-weight: 800;
+  color: var(--success);
+}
+
+/* MODAL OVERLAY */
+.mines-modal-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fadeIn 0.3s ease;
+}
+
+.mines-modal {
+  background: var(--bg-surface);
+  padding: var(--space-2xl);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-default);
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  max-width: 400px;
+  width: 90%;
+}
+
+.mines-modal h1 {
+  font-family: var(--font-family-display);
+  font-size: var(--font-3xl);
+  margin-bottom: var(--space-md);
+}
+
+.mines-modal h1.win {
+  color: var(--success);
+}
+
+.mines-modal h1.lose {
+  color: var(--danger);
+}
+
+.mines-modal p {
+  color: var(--text-secondary);
+}
+
+.mines-modal h2 {
+  color: var(--text-primary);
+  margin: var(--space-lg) 0;
+  font-size: var(--font-2xl);
+}
+
+/* ANIMATIONS */
+@keyframes pulseGem {
+  0% { box-shadow: 0 0 10px rgba(0, 204, 102, 0.1), inset 0 0 10px rgba(0, 204, 102, 0.05); }
+  100% { box-shadow: 0 0 20px rgba(0, 204, 102, 0.3), inset 0 0 20px rgba(0, 204, 102, 0.1); }
+}
+
+@keyframes shakeBomb {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 900px) {
+  .mines-container {
+    flex-direction: column-reverse;
+    overflow-y: auto;
+  }
+  .mines-sidebar {
+    width: 100%;
+    border-right: none;
+    border-top: 1px solid var(--border-default);
+    padding: var(--space-lg);
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.05);
+  }
+  .mines-main {
+    padding: var(--space-sm);
+  }
+  .mines-grid {
+    gap: 8px;
+    padding: 12px;
+  }
+  .mine-tile {
+    font-size: 1.5rem;
+  }
+  .timer-container {
+    margin-bottom: var(--space-md);
+  }
+  .timer-circle {
+    width: 80px;
+    height: 80px;
+  }
+  .timer-circle::before {
+    width: 70px;
+    height: 70px;
+  }
+  .timer-text {
+    font-size: var(--font-xl);
+  }
+}
