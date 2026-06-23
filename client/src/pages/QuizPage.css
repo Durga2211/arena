@@ -144,37 +144,61 @@
 }
 
 .quiz__question-text {
-  font-size: var(--font-xl);
+  font-size: 1.5rem;
   font-weight: 700;
-  line-height: 1.5;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  line-height: 1.4;
 }
 
-/* Options — Arcade buttons */
+/* Options */
 .quiz__options {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-xl);
+  gap: var(--space-md);
 }
 
 .quiz__option {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
-  padding: 1rem var(--space-lg);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  font-size: var(--font-md);
+  width: 100%;
+  padding: 1.25rem 1.5rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 1.1rem;
   font-weight: 500;
-  animation: fadeInUp 0.3s ease both;
-  background: var(--glass-bg);
-  position: relative;
-  overflow: hidden;
+  font-family: var(--font-family-base);
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition-bounce);
+  opacity: 0;
+  animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  box-shadow: var(--shadow-sm);
 }
 
-/* Hover shimmer */
+.quiz__option:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: var(--bg-hover);
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px var(--primary-glow);
+}
+
+.quiz__option-letter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 50%;
+  margin-right: 1.5rem;
+  font-weight: 700;
+  font-family: var(--font-family-display);
+  color: var(--text-secondary);
+}
+
 .quiz__option::after {
   content: '';
   position: absolute;
@@ -182,7 +206,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.03), transparent);
   transition: left 0.4s ease;
 }
 
