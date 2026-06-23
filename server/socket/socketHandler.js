@@ -74,9 +74,9 @@ const setupSocket = (io) => {
               const timeRemaining = 60 - Math.floor((Date.now() - gameState.startTime) / 1000);
               const clientQuestions = gameState.questions.map((q, i) => ({
                 index: i,
-                question: q.question,
-                options: q.options,
-                category: q.category,
+                question: q.question || q.text || q.title || q.Question || 'Missing question text',
+                options: q.options || q.choices || q.answers || q.Options || ['A', 'B', 'C', 'D'],
+                category: q.category || q.Category || 'General',
               }));
               
               socket.emit('quiz:start', {

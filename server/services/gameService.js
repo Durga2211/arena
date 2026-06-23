@@ -90,9 +90,9 @@ class GameService {
       // Prepare questions for clients (hide correct answer)
       const clientQuestions = questions.map((q, i) => ({
         index: i,
-        question: q.question,
-        options: q.options,
-        category: q.category,
+        question: q.question || q.text || q.title || q.Question || 'Missing question text',
+        options: q.options || q.choices || q.answers || q.Options || ['A', 'B', 'C', 'D'],
+        category: q.category || q.Category || 'General',
       }));
 
       // Store game state in memory
