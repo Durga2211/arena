@@ -17,17 +17,22 @@ class GameService {
   }
 
   async startCountdown(roomId) {
-    // Prevent double-start
+    // Prevent double-start synchronously
     if (this.activeCountdowns.has(roomId)) return;
-
-    const room = await Room.findById(roomId);
-    if (!room || room.status !== 'waiting') return;
-
-    room.status = 'countdown';
-    await room.save();
-
+    
+    // Set lock immediately to prevent race conditions during async DB operations
     let count = COUNTDOWN_SECONDS;
     this.activeCountdowns.set(roomId, { remaining: count });
+
+    try {
+      const room = await Room.findById(roomId);
+      if (!room || room.status !== 'waiting') {
+        this.activeCountdowns.delete(roomId);
+        return;
+      }
+
+      room.status = 'countdown';
+      await room.save();
 
     const countdownInterval = setInterval(async () => {
       this.io.to(roomId).emit('room:countdown', { seconds: count });
@@ -44,6 +49,11 @@ class GameService {
         }
       }
     }, 1000);
+    
+    } catch (error) {
+      console.error('Error in startCountdown:', error);
+      this.activeCountdowns.delete(roomId);
+    }
   }
 
   async startShooter(roomId) {
