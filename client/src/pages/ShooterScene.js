@@ -302,11 +302,11 @@ export default class ShooterScene extends Phaser.Scene {
 
         this.tweens.add({
           targets: pObj.sprite, x: pData.x, y: pData.y, rotation: pData.rotation,
-          duration: 33, ease: 'Linear',
+          duration: 100, ease: 'Linear', overwrite: true,
         });
         this.tweens.add({
           targets: [pObj.nameText, pObj.hpBar], x: pData.x, y: pData.y,
-          duration: 33, ease: 'Linear',
+          duration: 100, ease: 'Linear', overwrite: true,
         });
 
         pObj.hpBar.clear();
@@ -342,7 +342,11 @@ export default class ShooterScene extends Phaser.Scene {
       if (!this.bulletSprites[bId]) {
         this.bulletSprites[bId] = this.add.sprite(bData.x, bData.y, 'bullet_tex').setDepth(5);
       } else {
-        this.bulletSprites[bId].setPosition(bData.x, bData.y);
+        this.tweens.add({
+          targets: this.bulletSprites[bId],
+          x: bData.x, y: bData.y,
+          duration: 100, ease: 'Linear', overwrite: true,
+        });
       }
     }
 
