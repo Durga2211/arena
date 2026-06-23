@@ -200,7 +200,7 @@ const setupSocket = (io) => {
         const pId = socket.userId;
         const res = gameState.results.get(pId) || { gems: 0, survivalTime: 30000, firstClickTime: Infinity, status: 'DIGGING' };
         res.gems = gems;
-        res.survivalTime = survivalTime;
+        res.survivalTime = Date.now() - gameState.startTime;
         res.status = 'ELIMINATED';
         gameState.results.set(pId, res);
         io.to(roomId).emit('mines:update', {
