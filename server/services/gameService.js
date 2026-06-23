@@ -365,9 +365,9 @@ class GameService {
       }
 
       scores.sort((a, b) => {
-        if (b.survivalTime !== a.survivalTime) return b.survivalTime - a.survivalTime;
-        if (b.gems !== a.gems) return b.gems - a.gems;
-        return a.firstClickTime - b.firstClickTime;
+        if (b.gems !== a.gems) return b.gems - a.gems; // Primary: Max Gems wins
+        if (b.survivalTime !== a.survivalTime) return b.survivalTime - a.survivalTime; // Secondary: Longest survival wins tie
+        return a.firstClickTime - b.firstClickTime; // Tertiary: Fastest first click wins tie
       });
 
       scores.forEach((s, i) => { s.rank = i + 1; });
