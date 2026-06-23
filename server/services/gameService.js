@@ -4,7 +4,7 @@ const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 
 const QUIZ_DURATION = 30; // seconds
-const QUESTIONS_PER_QUIZ = 100;
+const QUESTIONS_PER_QUIZ = 10;
 const COUNTDOWN_SECONDS = 5;
 const PLATFORM_FEE_PERCENT = 10;
 // New rules: Winner gets 500, rest get 10.
@@ -76,7 +76,7 @@ class GameService {
         { $sample: { size: QUESTIONS_PER_QUIZ } },
       ]);
 
-      if (questions.length < QUESTIONS_PER_QUIZ) {
+      if (questions.length === 0) {
         this.io.to(roomId).emit('quiz:error', { message: 'Not enough questions available' });
         return;
       }
@@ -107,7 +107,7 @@ class GameService {
       this.io.to(roomId).emit('quiz:start', {
         questions: clientQuestions,
         totalTime: QUIZ_DURATION,
-        totalQuestions: QUESTIONS_PER_QUIZ,
+        totalQuestions: clientQuestions.length,
       });
 
       // Server timer
