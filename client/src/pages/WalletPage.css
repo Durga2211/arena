@@ -1,0 +1,183 @@
+/* ═══════════════════════════════════════════════
+   WALLET PAGE — Gaming Theme
+   ═══════════════════════════════════════════════ */
+
+.wallet {
+  padding: var(--space-2xl) 0;
+}
+
+.wallet__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-2xl);
+}
+
+/* Balance card */
+.wallet__balance-card {
+  padding: var(--space-xl);
+  background: var(--glass-bg);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  animation: fadeInUp 0.5s ease;
+}
+
+.wallet__balance-label {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: var(--font-family-display);
+}
+
+.wallet__balance-amount {
+  font-size: var(--font-4xl);
+  font-weight: 900;
+  color: var(--text-primary);
+  margin-bottom: var(--space-lg);
+  font-family: var(--font-family-display);
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.08);
+}
+
+.wallet__balance-actions {
+  display: flex;
+  gap: var(--space-md);
+}
+
+/* Add money / Withdraw cards */
+.wallet__action-card {
+  padding: var(--space-xl);
+  animation: fadeInUp 0.5s ease 0.1s both;
+}
+
+.wallet__action-card h3 {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  margin-bottom: var(--space-lg);
+  font-family: var(--font-family-display);
+  letter-spacing: 0.02em;
+}
+
+.wallet__amount-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.wallet__amount-btn {
+  padding: 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: var(--font-sm);
+  text-align: center;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  color: var(--text-primary);
+  background: transparent;
+  font-family: var(--font-family-display);
+}
+
+.wallet__amount-btn:hover,
+.wallet__amount-btn--active {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.03);
+}
+
+.wallet__custom-input {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+/* Transactions */
+.wallet__transactions {
+  animation: fadeInUp 0.5s ease 0.2s both;
+}
+
+.wallet__transactions h3 {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  margin-bottom: var(--space-lg);
+  padding: 0 var(--space-lg);
+  font-family: var(--font-family-display);
+  letter-spacing: 0.02em;
+}
+
+.wallet__txn-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.wallet__txn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem var(--space-lg);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  transition: background var(--transition-fast);
+}
+
+.wallet__txn:last-child {
+  border-bottom: none;
+}
+
+.wallet__txn:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.wallet__txn-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.wallet__txn-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.wallet__txn-desc {
+  font-size: var(--font-sm);
+  font-weight: 500;
+}
+
+.wallet__txn-date {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+}
+
+.wallet__txn-amount {
+  font-weight: 700;
+  font-size: var(--font-sm);
+  font-family: var(--font-family-display);
+}
+
+.wallet__txn-amount--positive {
+  color: var(--success);
+}
+
+.wallet__txn-amount--negative {
+  color: var(--danger-light);
+}
+
+@media (max-width: 768px) {
+  .wallet__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wallet__balance-amount {
+    font-size: var(--font-3xl);
+  }
+}

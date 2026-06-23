@@ -1,0 +1,198 @@
+/* ═══════════════════════════════════════════════
+   RESULTS PAGE — Gaming Theme
+   ═══════════════════════════════════════════════ */
+
+.results {
+  padding: var(--space-2xl) 0;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.results__header {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+  animation: fadeInUp 0.5s ease;
+}
+
+.results__title {
+  font-size: var(--font-3xl);
+  font-weight: 900;
+  margin-bottom: var(--space-sm);
+  font-family: var(--font-family-display);
+  letter-spacing: 0.02em;
+}
+
+.results__subtitle {
+  color: var(--text-secondary);
+}
+
+/* Podium */
+.results__podium {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-2xl);
+  min-height: 260px;
+}
+
+.results__podium-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  animation: fadeInUp 0.6s ease both;
+}
+
+.results__podium-item--1st {
+  order: 2;
+  animation-delay: 0.2s;
+}
+.results__podium-item--2nd {
+  order: 1;
+  animation-delay: 0.3s;
+}
+.results__podium-item--3rd {
+  order: 3;
+  animation-delay: 0.4s;
+}
+
+.results__podium-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: var(--font-md);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.results__podium-item--1st .results__podium-avatar {
+  width: 72px;
+  height: 72px;
+  font-size: var(--font-lg);
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.15);
+  border-color: rgba(255, 215, 0, 0.3);
+}
+
+.results__podium-name {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  text-align: center;
+}
+
+.results__podium-prize {
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--success);
+  font-family: var(--font-family-display);
+}
+
+.results__podium-block {
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-3xl);
+  font-weight: 900;
+  min-width: 100px;
+  font-family: var(--font-family-display);
+}
+
+.results__podium-block--1st {
+  height: 120px;
+  background: rgba(255, 215, 0, 0.08);
+  border: 1px solid rgba(255, 215, 0, 0.15);
+  color: #ffd700;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+}
+
+.results__podium-block--2nd {
+  height: 90px;
+  background: rgba(192, 192, 192, 0.06);
+  border: 1px solid rgba(192, 192, 192, 0.1);
+  color: #c0c0c0;
+}
+
+.results__podium-block--3rd {
+  height: 70px;
+  background: rgba(205, 127, 50, 0.06);
+  border: 1px solid rgba(205, 127, 50, 0.1);
+  color: #cd7f32;
+}
+
+/* Results table */
+.results__table-card {
+  margin-bottom: var(--space-xl);
+  overflow: hidden;
+  animation: fadeInUp 0.6s ease 0.3s both;
+}
+
+.results__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.results__table th {
+  text-align: left;
+  padding: 0.875rem var(--space-lg);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  font-family: var(--font-family-display);
+}
+
+.results__table td {
+  padding: 0.875rem var(--space-lg);
+  font-size: var(--font-sm);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.results__table tr:last-child td {
+  border-bottom: none;
+}
+
+.results__table-row--you {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.results__player-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.results__player-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--text-primary);
+  flex-shrink: 0;
+}
+
+.results__actions {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  animation: fadeInUp 0.6s ease 0.5s both;
+}
+
+@media (max-width: 768px) {
+  .results__podium-block {
+    min-width: 80px;
+  }
+}

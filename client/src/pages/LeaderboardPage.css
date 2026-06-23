@@ -1,0 +1,75 @@
+/* ═══════════════════════════════════════════════
+   LEADERBOARD PAGE — Gaming Theme
+   ═══════════════════════════════════════════════ */
+
+.leaderboard {
+  padding: var(--space-2xl) 0;
+}
+
+.leaderboard__card {
+  overflow: hidden;
+  animation: fadeInUp 0.5s ease;
+}
+
+.leaderboard__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.leaderboard__table th {
+  text-align: left;
+  padding: 1rem var(--space-lg);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.02);
+  font-family: var(--font-family-display);
+}
+
+.leaderboard__table td {
+  padding: 0.875rem var(--space-lg);
+  font-size: var(--font-sm);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.leaderboard__table tr:last-child td {
+  border-bottom: none;
+}
+
+.leaderboard__table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.leaderboard__rank {
+  font-weight: 800;
+  font-size: var(--font-md);
+  font-family: var(--font-family-display);
+}
+
+.leaderboard__rank--1 { color: #ffd700; text-shadow: 0 0 8px rgba(255, 215, 0, 0.3); }
+.leaderboard__rank--2 { color: #c0c0c0; text-shadow: 0 0 6px rgba(192, 192, 192, 0.2); }
+.leaderboard__rank--3 { color: #cd7f32; text-shadow: 0 0 6px rgba(205, 127, 50, 0.2); }
+
+.leaderboard__player {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.leaderboard__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--text-primary);
+  flex-shrink: 0;
+}

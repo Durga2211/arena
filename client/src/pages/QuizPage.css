@@ -1,0 +1,282 @@
+/* ═══════════════════════════════════════════════
+   QUIZ PAGE — Gaming HUD Theme
+   ═══════════════════════════════════════════════ */
+
+.quiz {
+  padding: var(--space-xl) 0;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Timer Bar — HUD style */
+.quiz__timer-container {
+  margin-bottom: var(--space-lg);
+  animation: fadeIn 0.3s ease;
+}
+
+.quiz__timer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-sm);
+}
+
+.quiz__timer-label {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  font-weight: 600;
+  font-family: var(--font-family-display);
+  letter-spacing: 0.08em;
+}
+
+.quiz__timer-value {
+  font-size: var(--font-lg);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-family-display);
+}
+
+.quiz__timer-value--danger {
+  color: var(--danger);
+  text-shadow: 0 0 10px rgba(255, 68, 68, 0.3);
+  animation: pulse 0.5s infinite;
+}
+
+.quiz__timer-value--warning {
+  color: var(--warning);
+  text-shadow: 0 0 8px rgba(245, 159, 0, 0.2);
+}
+
+.quiz__timer-value--safe {
+  color: var(--text-primary);
+}
+
+.quiz__timer-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+}
+
+.quiz__timer-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 1s linear, background-color 2s ease;
+}
+
+.quiz__timer-fill--safe {
+  background: linear-gradient(90deg, rgba(255,255,255,0.6), var(--text-primary));
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+}
+
+.quiz__timer-fill--warning {
+  background: linear-gradient(90deg, var(--warning), var(--warning-light));
+  box-shadow: 0 0 10px rgba(245, 159, 0, 0.2);
+}
+
+.quiz__timer-fill--danger {
+  background: linear-gradient(90deg, var(--danger), var(--danger-light));
+  box-shadow: 0 0 12px rgba(255, 68, 68, 0.3);
+  animation: pulseGlow 0.5s infinite;
+}
+
+/* HUD Score Display */
+.quiz__hud {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-xl);
+  padding: var(--space-md) var(--space-xl);
+  border-radius: var(--radius-lg);
+  background: var(--glass-bg);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  margin-bottom: var(--space-xl);
+  animation: fadeIn 0.3s ease;
+}
+
+.quiz__hud-item {
+  text-align: center;
+}
+
+.quiz__hud-value {
+  font-size: var(--font-xl);
+  font-weight: 800;
+  font-family: var(--font-family-display);
+}
+
+.quiz__hud-label {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: var(--font-family-display);
+}
+
+.quiz__hud-divider {
+  width: 1px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Question Card */
+.quiz__question-card {
+  padding: var(--space-xl) var(--space-2xl);
+  margin-bottom: var(--space-lg);
+  animation: fadeInUp 0.3s ease;
+  text-align: center;
+}
+
+.quiz__question-category {
+  display: inline-block;
+  padding: 0.2rem 0.8rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-full);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--space-md);
+  font-family: var(--font-family-display);
+}
+
+.quiz__question-text {
+  font-size: var(--font-xl);
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+/* Options — Arcade buttons */
+.quiz__options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+}
+
+.quiz__option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 1rem var(--space-lg);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: var(--font-md);
+  font-weight: 500;
+  animation: fadeInUp 0.3s ease both;
+  background: var(--glass-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover shimmer */
+.quiz__option::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+  transition: left 0.4s ease;
+}
+
+.quiz__option:hover:not(.quiz__option--selected):not(.quiz__option--disabled)::after {
+  left: 100%;
+}
+
+.quiz__option:hover:not(.quiz__option--selected):not(.quiz__option--disabled) {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.03);
+  transform: translateX(6px);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.03);
+}
+
+.quiz__option--selected {
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.04);
+}
+
+.quiz__option--disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.quiz__option-letter {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-sm);
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+  font-family: var(--font-family-display);
+}
+
+.quiz__option--selected .quiz__option-letter {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  border-color: transparent;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 768px) {
+  .quiz {
+    padding: var(--space-md) var(--space-md);
+  }
+
+  .quiz__question-text {
+    font-size: var(--font-lg);
+  }
+
+  .quiz__hud {
+    gap: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+  }
+}
+
+.orientation-warning {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #0a0a0f;
+  z-index: 20000;
+  color: white;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+}
+
+.orientation-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  animation: rotatePhone 2s ease-in-out infinite;
+}
+
+@keyframes rotatePhone {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(-90deg); }
+  100% { transform: rotate(-90deg); }
+}
+
+@media screen and (orientation: portrait) and (max-width: 800px) {
+  .orientation-warning {
+    display: flex;
+  }
+}

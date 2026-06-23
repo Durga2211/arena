@@ -1,0 +1,224 @@
+/* ═══════════════════════════════════════════════
+   LOBBY PAGE — Gaming Theme
+   ═══════════════════════════════════════════════ */
+
+.lobby {
+  padding: var(--space-2xl) 0;
+}
+
+.lobby__header {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+  animation: fadeInUp 0.5s ease;
+}
+
+.lobby__room-code {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 0.4rem 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-full);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+  letter-spacing: 0.08em;
+  font-family: var(--font-family-display);
+}
+
+.lobby__title {
+  font-size: var(--font-3xl);
+  font-weight: 800;
+  margin-bottom: var(--space-sm);
+  font-family: var(--font-family-display);
+  letter-spacing: 0.02em;
+}
+
+.lobby__subtitle {
+  color: var(--text-secondary);
+  font-size: var(--font-md);
+}
+
+.lobby__info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xl);
+  margin-top: var(--space-lg);
+}
+
+.lobby__info-item {
+  text-align: center;
+}
+
+.lobby__info-value {
+  font-size: var(--font-xl);
+  font-weight: 800;
+  font-family: var(--font-family-display);
+}
+
+.lobby__info-label {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: var(--font-family-display);
+}
+
+/* Player Grid */
+.lobby__grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-md);
+  max-width: 700px;
+  margin: 0 auto var(--space-2xl);
+}
+
+.lobby__slot {
+  aspect-ratio: 1;
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  transition: all var(--transition-base);
+}
+
+.lobby__slot--empty {
+  border: 2px dashed rgba(255, 255, 255, 0.06);
+  background: transparent;
+}
+
+.lobby__slot--filled {
+  background: var(--glass-bg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  animation: bounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.lobby__slot--you {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.03);
+}
+
+.lobby__slot-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.lobby__slot-name {
+  font-size: var(--font-xs);
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  padding: 0 var(--space-xs);
+}
+
+.lobby__slot-icon {
+  font-size: 1.5rem;
+  opacity: 0.15;
+}
+
+/* Waiting animation */
+.lobby__waiting {
+  text-align: center;
+  padding: var(--space-xl);
+  animation: fadeIn 0.5s ease;
+}
+
+.lobby__waiting-dots {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.lobby__waiting-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  animation: pulse 1.5s infinite;
+}
+
+.lobby__waiting-dots span:nth-child(2) { animation-delay: 0.3s; }
+.lobby__waiting-dots span:nth-child(3) { animation-delay: 0.6s; }
+
+.lobby__waiting-text {
+  margin-top: var(--space-md);
+  color: var(--text-secondary);
+  font-size: var(--font-sm);
+}
+
+/* Countdown overlay */
+.countdown-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(10, 10, 15, 0.95);
+  backdrop-filter: blur(30px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.countdown-number {
+  font-size: 8rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  animation: countdownPop 1s ease both;
+  line-height: 1;
+  font-family: var(--font-family-display);
+  text-shadow: 0 0 40px rgba(255, 255, 255, 0.2);
+}
+
+@keyframes countdownPop {
+  0% { transform: scale(2); opacity: 0; }
+  30% { transform: scale(0.9); opacity: 1; }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.countdown-label {
+  font-size: var(--font-xl);
+  color: var(--text-secondary);
+  margin-top: var(--space-lg);
+  font-weight: 600;
+  font-family: var(--font-family-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 768px) {
+  .lobby__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .lobby__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .countdown-number {
+    font-size: 5rem;
+  }
+  .countdown-label {
+    font-size: var(--font-lg);
+  }
+}

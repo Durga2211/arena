@@ -1,0 +1,297 @@
+/* ═══════════════════════════════════════════════
+   HOME PAGE — Gaming Theme
+   ═══════════════════════════════════════════════ */
+
+.home {
+  padding: var(--space-2xl) 0;
+}
+
+/* Welcome Section */
+.home__welcome {
+  margin-bottom: var(--space-2xl);
+  animation: fadeInUp 0.5s ease;
+}
+
+.home__greeting {
+  font-size: var(--font-2xl);
+  font-weight: 800;
+  margin-bottom: var(--space-xs);
+}
+
+.home__greeting-name {
+  background: linear-gradient(135deg, #ffffff, #888888);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.home__greeting-wave {
+  display: inline-block;
+  animation: wave 2s ease-in-out infinite;
+  transform-origin: 70% 70%;
+}
+
+@keyframes wave {
+  0%, 100% { transform: rotate(0deg); }
+  10% { transform: rotate(14deg); }
+  20% { transform: rotate(-8deg); }
+  30% { transform: rotate(14deg); }
+  40% { transform: rotate(-4deg); }
+  50% { transform: rotate(10deg); }
+  60% { transform: rotate(0deg); }
+}
+
+.home__greeting-sub {
+  color: var(--text-secondary);
+  font-size: var(--font-sm);
+}
+
+/* Stats row */
+.home__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-2xl);
+}
+
+.home__stat-card {
+  padding: var(--space-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  animation: fadeInUp 0.5s ease both;
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.home__stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-accent-glow);
+}
+
+.home__stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.home__stat-value {
+  font-size: var(--font-xl);
+  font-weight: 800;
+  font-family: var(--font-family-display);
+}
+
+.home__stat-label {
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Section titles */
+.home__section-title {
+  font-size: var(--font-xl);
+  font-weight: 700;
+  margin-bottom: var(--space-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-family: var(--font-family-display);
+  letter-spacing: 0.02em;
+}
+
+.home__section-icon {
+  font-size: 1.3rem;
+}
+
+/* Arena Room Card */
+.home__arena-wrapper {
+  margin-bottom: var(--space-2xl);
+}
+
+.home__arena-card {
+  max-width: 480px;
+  padding: 0;
+  position: relative;
+  animation: fadeInUp 0.5s ease 0.1s both;
+  overflow: hidden;
+}
+
+.home__arena-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.03) 0%,
+    transparent 50%,
+    rgba(255,255,255,0.02) 100%
+  );
+  pointer-events: none;
+}
+
+.home__arena-card:hover {
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.04), var(--shadow-lg);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.home__arena-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-xl);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.home__arena-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  color: var(--success);
+  font-family: var(--font-family-display);
+  letter-spacing: 0.1em;
+}
+
+.home__arena-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 6px rgba(0, 204, 102, 0.5);
+  animation: pulse 1.5s infinite;
+}
+
+.home__arena-tier {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  font-family: var(--font-family-display);
+}
+
+.home__arena-body {
+  padding: var(--space-xl);
+}
+
+.home__arena-fee {
+  font-size: var(--font-3xl);
+  font-weight: 900;
+  color: var(--text-primary);
+  margin-bottom: var(--space-xs);
+  font-family: var(--font-family-display);
+}
+
+.home__arena-fee span {
+  font-size: var(--font-lg);
+  color: var(--text-tertiary);
+  font-weight: 500;
+  font-family: var(--font-family);
+}
+
+.home__arena-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.home__arena-info-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+}
+
+.home__arena-info-value {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-family: var(--font-family-display);
+  font-size: var(--font-xs);
+}
+
+.home__arena-players-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-full);
+  margin-bottom: var(--space-lg);
+  overflow: hidden;
+}
+
+.home__arena-players-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--text-primary), rgba(255,255,255,0.6));
+  border-radius: var(--radius-full);
+  transition: width 0.5s ease;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+}
+
+.home__arena-btn {
+  font-family: var(--font-family-display);
+  letter-spacing: 0.06em;
+}
+
+/* Recent games */
+.home__recent {
+  margin-bottom: var(--space-xl);
+}
+
+.home__recent-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.home__recent-table th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  font-family: var(--font-family-display);
+}
+
+.home__recent-table td {
+  padding: 0.75rem 1rem;
+  font-size: var(--font-sm);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.home__recent-table tr:last-child td {
+  border-bottom: none;
+}
+
+.home__recent-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.home__empty {
+  text-align: center;
+  padding: var(--space-2xl);
+  color: var(--text-tertiary);
+  font-size: var(--font-sm);
+}
+
+.home__empty-icon {
+  font-size: 2rem;
+  margin-bottom: var(--space-sm);
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .home__stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
