@@ -38,6 +38,12 @@ const LobbyPage = () => {
       if (data.maxPlayers) {
         setRoom((prev) => prev ? { ...prev, maxPlayers: data.maxPlayers, gameType: data.gameType || prev.gameType } : prev);
       }
+      
+      // Fallback: if we join and game is already active, jump straight in
+      if (data.status === 'active') {
+        if (data.gameType === 'shooter') navigate(`/shooter/${roomId}`);
+        else navigate(`/quiz/${roomId}`);
+      }
     });
 
     socket.on('room:player-joined', (data) => {

@@ -66,22 +66,26 @@ const setupSocket = (io) => {
 
         // If room is active, sync the game state
         if (room.status === 'active') {
-          const gameState = gameService.activeGames.get(roomId);
-          if (gameState) {
-            const timeRemaining = 60 - Math.floor((Date.now() - gameState.startTime) / 1000);
-            const clientQuestions = gameState.questions.map((q, i) => ({
-              index: i,
-              question: q.question,
-              options: q.options,
-              category: q.category,
-            }));
-            
-            socket.emit('quiz:start', {
-              questions: clientQuestions,
-              totalTime: 60,
-              totalQuestions: clientQuestions.length,
-            });
-            socket.emit('quiz:tick', { timeRemaining });
+          if (room.gameType === 'shooter') {
+            socket.emit('shooter:start');
+          } else {
+            const gameState = gameService.activeGames.get(roomId);
+            if (gameState) {
+              const timeRemaining = 60 - Math.floor((Date.now() - gameState.startTime) / 1000);
+              const clientQuestions = gameState.questions.map((q, i) => ({
+                index: i,
+                question: q.question,
+                options: q.options,
+                category: q.category,
+              }));
+              
+              socket.emit('quiz:start', {
+                questions: clientQuestions,
+                totalTime: 60,
+                totalQuestions: clientQuestions.length,
+              });
+              socket.emit('quiz:tick', { timeRemaining });
+            }
           }
         }
 

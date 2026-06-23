@@ -92,9 +92,56 @@ export default class ShooterScene extends Phaser.Scene {
       right: Phaser.Input.Keyboard.KeyCodes.D,
     });
 
-    this.input.on('pointerdown', () => {
-      if (this.socket && this.myId) this.socket.emit('shoot');
+    // Mobile Joystick
+    this.input.addPointer(2); // Enable multi-touch
+    this.joystickBase = this.add.circle(100, 500, 40, 0x888888, 0.2).setDepth(400).setScrollFactor(0);
+    this.joystickThumb = this.add.circle(100, 500, 20, 0xcccccc, 0.5).setDepth(401).setScrollFactor(0);
+    this.joystickActive = false;
+    this.joystickVector = { x: 0, y: 0 };
+    this.joystickPointerId = null;
+
+    this.input.on('pointerdown', (pointer) => {
+      if (pointer.x < 400 && !this.joystickActive) {
+        // Left side: move joystick
+        this.joystickActive = true;
+        this.joystickPointerId = pointer.id;
+        this.joystickBase.setPosition(pointer.x, pointer.y);
+        this.joystickThumb.setPosition(pointer.x, pointer.y);
+      } else {
+        // Right side: shoot
+        if (this.socket && this.myId) {
+          this.socket.emit('shoot');
+        }
+      }
     });
+
+    this.input.on('pointermove', (pointer) => {
+      if (this.joystickActive && pointer.id === this.joystickPointerId) {
+        let dx = pointer.x - this.joystickBase.x;
+        let dy = pointer.y - this.joystickBase.y;
+        let dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist > 40) {
+          dx = (dx / dist) * 40;
+          dy = (dy / dist) * 40;
+        }
+        this.joystickThumb.setPosition(this.joystickBase.x + dx, this.joystickBase.y + dy);
+        this.joystickVector.x = dx / 40;
+        this.joystickVector.y = dy / 40;
+      }
+    });
+
+    const stopJoystick = (pointer) => {
+      if (pointer.id === this.joystickPointerId) {
+        this.joystickActive = false;
+        this.joystickPointerId = null;
+        this.joystickBase.setPosition(100, 500);
+        this.joystickThumb.setPosition(100, 500);
+        this.joystickVector = { x: 0, y: 0 };
+      }
+    };
+
+    this.input.on('pointerup', stopJoystick);
+    this.input.on('pointerout', stopJoystick);
 
     // ── Mark ready ──
     this.isReady = true;
@@ -338,13 +385,32 @@ export default class ShooterScene extends Phaser.Scene {
     if (this.cursors.up.isDown) { dy = -1; moved = true; }
     if (this.cursors.down.isDown) { dy = 1; moved = true; }
 
-    const pointer = this.input.activePointer;
-    this.crosshair.setPosition(pointer.x, pointer.y);
-    
+    // Joystick movement
+    if (this.joystickActive) {
+      if (this.joystickVector.x < -0.3) { dx = -1; moved = true; }
+      else if (this.joystickVector.x > 0.3) { dx = 1; moved = true; }
+      if (this.joystickVector.y < -0.3) { dy = -1; moved = true; }
+      else if (this.joystickVector.y > 0.3) { dy = 1; moved = true; }
+    }
+
+    // Aiming pointer logic
+    let aimPointer = this.input.activePointer;
+    if (this.joystickActive && aimPointer.id === this.joystickPointerId) {
+      // Find a pointer that isn't the joystick
+      if (this.input.pointer1.active && this.input.pointer1.id !== this.joystickPointerId) {
+        aimPointer = this.input.pointer1;
+      } else if (this.input.pointer2.active && this.input.pointer2.id !== this.joystickPointerId) {
+        aimPointer = this.input.pointer2;
+      }
+    }
+
     let rotation = undefined;
-    if (this.playerSprites[this.myId]) {
-      const pSprite = this.playerSprites[this.myId].sprite;
-      rotation = Phaser.Math.Angle.Between(pSprite.x, pSprite.y, pointer.x, pointer.y);
+    if (aimPointer && aimPointer.active && aimPointer.id !== this.joystickPointerId) {
+      this.crosshair.setPosition(aimPointer.x, aimPointer.y);
+      if (this.playerSprites[this.myId]) {
+        const pSprite = this.playerSprites[this.myId].sprite;
+        rotation = Phaser.Math.Angle.Between(pSprite.x, pSprite.y, aimPointer.x, aimPointer.y);
+      }
     }
 
     if (moved || rotation !== undefined) {
