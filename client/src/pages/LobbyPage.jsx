@@ -123,7 +123,8 @@ const LobbyPage = () => {
     );
   }
 
-  const slots = Array.from({ length: 10 }, (_, i) => players[i] || null);
+  const maxPlayers = room?.maxPlayers || 10;
+  const slots = Array.from({ length: maxPlayers }, (_, i) => players[i] || null);
 
   return (
     <div className="page">
@@ -145,7 +146,7 @@ const LobbyPage = () => {
           </div>
           <h1 className="lobby__title">Waiting for Players</h1>
           <p className="lobby__subtitle">
-            {players.length}/10 players joined
+            {players.length}/{maxPlayers} players joined
           </p>
 
           <div className="lobby__info">
@@ -207,7 +208,7 @@ const LobbyPage = () => {
         </div>
 
         {/* Waiting indicator */}
-        {players.length < 10 && (
+        {players.length < maxPlayers && (
           <div className="lobby__waiting">
             <div className="lobby__waiting-dots">
               <span></span>
@@ -215,7 +216,7 @@ const LobbyPage = () => {
               <span></span>
             </div>
             <p className="lobby__waiting-text">
-              Waiting for {10 - players.length} more player{10 - players.length !== 1 ? 's' : ''}...
+              Waiting for {maxPlayers - players.length} more player{maxPlayers - players.length !== 1 ? 's' : ''}...
             </p>
             <button
               className="btn btn--outline btn--sm"
