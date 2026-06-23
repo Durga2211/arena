@@ -20,6 +20,7 @@ import ProfilePage from './pages/ProfilePage';
 import AdminPage from './pages/AdminPage';
 import WelcomeRoomPage from './pages/WelcomeRoomPage';
 import ShooterPage from './pages/ShooterPage';
+import MinesPage from './pages/MinesPage';
 
 function App() {
   return (
@@ -74,6 +75,7 @@ function App() {
               <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
               <Route path="/join/:roomCode" element={<ProtectedRoute><WelcomeRoomPage /></ProtectedRoute>} />
               <Route path="/shooter/:roomId" element={<ProtectedRoute><ShooterPage /></ProtectedRoute>} />
+              <Route path="/mines/:roomId" element={<ProtectedRoute><MinesPage /></ProtectedRoute>} />
             </Routes>
           </WalletProvider>
         </SocketProvider>

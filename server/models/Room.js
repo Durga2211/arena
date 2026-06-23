@@ -8,7 +8,7 @@ const roomSchema = new mongoose.Schema({
   },
   gameType: {
     type: String,
-    enum: ['quiz', 'shooter'],
+    enum: ['quiz', 'shooter', 'mines'],
     default: 'quiz',
   },
   entryFee: {

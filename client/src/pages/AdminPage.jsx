@@ -379,6 +379,7 @@ const AdminPage = () => {
                   <select className="input" value={newRoomGameType} onChange={(e) => setNewRoomGameType(e.target.value)}>
                     <option value="quiz">Quiz Game</option>
                     <option value="shooter">Shooter Arena</option>
+                    <option value="mines">Mines (Gems & Mines)</option>
                   </select>
                 </div>
                 <div className="input-group">

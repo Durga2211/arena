@@ -68,6 +68,21 @@ const setupSocket = (io) => {
         if (room.status === 'active') {
           if (room.gameType === 'shooter') {
             socket.emit('shooter:start');
+          } else if (room.gameType === 'mines') {
+            const gameState = gameService.activeGames.get(roomId);
+            if (gameState && gameState.boards) {
+              const myBoard = gameState.boards[socket.userId.toString()];
+              const playersList = room.players.map(p => ({
+                userId: p.userId.toString(),
+                username: p.username,
+                avatar: p.avatar,
+              }));
+              socket.emit('mines:start', { 
+                mines: myBoard, 
+                startTime: gameState.startTime,
+                players: playersList 
+              });
+            }
           } else {
             const gameState = gameService.activeGames.get(roomId);
             if (gameState) {
@@ -149,6 +164,54 @@ const setupSocket = (io) => {
         questionIndex,
         answerIndex,
       });
+    });
+
+    // Mines Events
+    socket.on('mines:click', ({ roomId }) => {
+      const gameState = gameService.activeGames.get(roomId);
+      if (gameState) {
+        const pId = socket.userId;
+        const res = gameState.results.get(pId) || { gems: 0, survivalTime: 30000, firstClickTime: Infinity, status: 'DIGGING' };
+        if (res.firstClickTime === Infinity) {
+          res.firstClickTime = Date.now() - gameState.startTime;
+          gameState.results.set(pId, res);
+        }
+      }
+    });
+
+    socket.on('mines:gem', ({ roomId }) => {
+      const gameState = gameService.activeGames.get(roomId);
+      if (gameState) {
+        const pId = socket.userId;
+        const res = gameState.results.get(pId) || { gems: 0, survivalTime: 30000, firstClickTime: Infinity, status: 'DIGGING' };
+        res.gems += 1;
+        gameState.results.set(pId, res);
+        io.to(roomId).emit('mines:update', {
+          userId: pId,
+          status: 'DIGGING',
+          gems: res.gems,
+        });
+      }
+    });
+
+    socket.on('mines:eliminated', ({ roomId, gems, survivalTime }) => {
+      const gameState = gameService.activeGames.get(roomId);
+      if (gameState) {
+        const pId = socket.userId;
+        const res = gameState.results.get(pId) || { gems: 0, survivalTime: 30000, firstClickTime: Infinity, status: 'DIGGING' };
+        res.gems = gems;
+        res.survivalTime = survivalTime;
+        res.status = 'ELIMINATED';
+        gameState.results.set(pId, res);
+        io.to(roomId).emit('mines:update', {
+          userId: pId,
+          status: 'ELIMINATED',
+          gems,
+        });
+
+        // Check if all players are eliminated to end the game early
+        gameService.checkMinesGameEnd(roomId);
+      }
     });
 
     // Disconnect

@@ -42,6 +42,7 @@ const LobbyPage = () => {
       // Fallback: if we join and game is already active, jump straight in
       if (data.status === 'active') {
         if (data.gameType === 'shooter') navigate(`/shooter/${roomId}`);
+        else if (data.gameType === 'mines') navigate(`/mines/${roomId}`);
         else navigate(`/quiz/${roomId}`);
       }
     });
@@ -70,6 +71,10 @@ const LobbyPage = () => {
       navigate(`/shooter/${roomId}`);
     });
 
+    socket.on('mines:start', () => {
+      navigate(`/mines/${roomId}`);
+    });
+
     socket.on('room:full', () => {
       // Room is full, countdown will start
     });
@@ -85,6 +90,8 @@ const LobbyPage = () => {
       socket.off('room:player-left');
       socket.off('room:countdown');
       socket.off('quiz:start');
+      socket.off('shooter:start');
+      socket.off('mines:start');
       socket.off('room:full');
       socket.off('room:cancelled');
     };
@@ -99,6 +106,8 @@ const LobbyPage = () => {
       if (data.room.status === 'active') {
         if (data.room.gameType === 'shooter') {
           navigate(`/shooter/${roomId}`);
+        } else if (data.room.gameType === 'mines') {
+          navigate(`/mines/${roomId}`);
         } else {
           navigate(`/quiz/${roomId}`);
         }
@@ -142,7 +151,7 @@ const LobbyPage = () => {
         {countdown !== null && countdown > 0 && (
           <div className="countdown-overlay">
             <div className="countdown-number" key={countdown}>{countdown}</div>
-            <div className="countdown-label">{room?.gameType === 'shooter' ? 'Game' : 'Quiz'} starting...</div>
+            <div className="countdown-label">{room?.gameType === 'shooter' ? 'Game' : room?.gameType === 'mines' ? 'Mines' : 'Quiz'} starting...</div>
           </div>
         )}
 
@@ -173,10 +182,10 @@ const LobbyPage = () => {
             </div>
             <div className="lobby__info-item">
               <div className="lobby__info-value">
-                {room?.gameType === 'shooter' ? '1 Min' : '10'}
+                {room?.gameType === 'shooter' ? '1 Min' : room?.gameType === 'mines' ? '30s' : '10'}
               </div>
               <div className="lobby__info-label">
-                {room?.gameType === 'shooter' ? 'Duration' : 'Questions'}
+                {room?.gameType === 'shooter' ? 'Duration' : room?.gameType === 'mines' ? 'Duration' : 'Questions'}
               </div>
             </div>
           </div>

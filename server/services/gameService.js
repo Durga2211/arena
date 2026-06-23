@@ -44,6 +44,8 @@ class GameService {
         this.activeCountdowns.delete(roomId);
         if (room.gameType === 'shooter') {
           await this.startShooter(roomId);
+        } else if (room.gameType === 'mines') {
+          await this.startMines(roomId);
         } else {
           await this.startQuiz(roomId);
         }
@@ -268,6 +270,159 @@ class GameService {
       this.activeGames.delete(roomId);
     } catch (error) {
       console.error('Error ending quiz:', error);
+    }
+  }
+
+  async startMines(roomId) {
+    try {
+      const room = await Room.findById(roomId);
+      room.status = 'active';
+      room.startedAt = new Date();
+      await room.save();
+
+      const boards = {};
+      for (const p of room.players) {
+        const mines = [];
+        while (mines.length < 3) {
+          const r = Math.floor(Math.random() * 25);
+          if (!mines.includes(r)) mines.push(r);
+        }
+        boards[p.userId.toString()] = mines;
+      }
+
+      this.activeGames.set(roomId, {
+        boards,
+        results: new Map(),
+        startTime: Date.now(),
+        timer: null,
+      });
+
+      this.io.to(roomId).emit('mines:start');
+      
+      const gameState = this.activeGames.get(roomId);
+      gameState.timer = setTimeout(async () => {
+        await this.endMines(roomId);
+      }, 30000);
+
+    } catch (error) {
+      console.error('Error starting mines:', error);
+    }
+  }
+
+  async checkMinesGameEnd(roomId) {
+    try {
+      const room = await Room.findById(roomId);
+      if (!room || room.status !== 'active') return;
+
+      const gameState = this.activeGames.get(roomId);
+      if (!gameState) return;
+
+      let allEliminated = true;
+      for (const p of room.players) {
+        const pId = p.userId.toString();
+        const res = gameState.results.get(pId);
+        if (!res || res.status !== 'ELIMINATED') {
+          allEliminated = false;
+          break;
+        }
+      }
+
+      if (allEliminated && room.players.length > 0) {
+        await this.endMines(roomId);
+      }
+    } catch (error) {
+      console.error('Error checking mines game end:', error);
+    }
+  }
+
+  async endMines(roomId) {
+    try {
+      const room = await Room.findById(roomId);
+      if (!room || room.status !== 'active') return;
+      
+      const gameState = this.activeGames.get(roomId);
+      if (!gameState) return;
+      if (gameState.timer) clearTimeout(gameState.timer);
+
+      const players = room.players;
+      let scores = [];
+
+      for (const p of players) {
+        const pId = p.userId.toString();
+        const res = gameState.results.get(pId) || { gems: 0, survivalTime: 30000, firstClickTime: Infinity, status: 'SURVIVED' };
+        if (!gameState.results.has(pId)) {
+          gameState.results.set(pId, res);
+        }
+        scores.push({
+          userId: p.userId,
+          username: p.username,
+          avatar: p.avatar,
+          gems: res.gems,
+          survivalTime: res.survivalTime,
+          firstClickTime: res.firstClickTime,
+          status: res.status
+        });
+      }
+
+      scores.sort((a, b) => {
+        if (b.survivalTime !== a.survivalTime) return b.survivalTime - a.survivalTime;
+        if (b.gems !== a.gems) return b.gems - a.gems;
+        return a.firstClickTime - b.firstClickTime;
+      });
+
+      scores.forEach((s, i) => { s.rank = i + 1; });
+
+      const prizePool = room.entryFee * room.players.length;
+      let totalPrizesDistributed = 0;
+
+      for (let i = 0; i < scores.length; i++) {
+        let prizeAmount = scores[i].rank === 1 ? prizePool * 0.5 : prizePool * 0.01;
+        scores[i].prize = prizeAmount;
+        totalPrizesDistributed += prizeAmount;
+      }
+
+      const platformFee = prizePool - totalPrizesDistributed;
+
+      room.status = 'completed';
+      room.completedAt = new Date();
+      room.results = scores;
+      room.prizePool = prizePool;
+      room.platformFee = platformFee;
+      await room.save();
+
+      for (const result of scores) {
+        if (result.prize > 0) {
+          await User.findByIdAndUpdate(result.userId, {
+            $inc: {
+              walletBalance: result.prize,
+              totalEarnings: result.prize,
+              totalWins: result.rank === 1 ? 1 : 0,
+            },
+          });
+
+          await Transaction.create({
+            userId: result.userId,
+            type: 'prize',
+            amount: result.prize,
+            status: 'completed',
+            roomId: room._id,
+            description: `Prize for rank #${result.rank} in Mines room ${room.roomCode}`,
+          });
+        }
+        await User.findByIdAndUpdate(result.userId, {
+          $inc: { totalGamesPlayed: 1 },
+        });
+      }
+
+      this.io.to(roomId).emit('mines:end', {
+        results: scores,
+        prizePool,
+        platformFee,
+      });
+
+      this.activeGames.delete(roomId);
+    } catch (error) {
+      console.error('Error ending mines:', error);
     }
   }
 }

@@ -118,6 +118,37 @@ const HomePage = () => {
           </div>
         </div>
 
+        {/* Quick Play */}
+        <h2 className="home__section-title">
+          <span className="home__section-icon">🚀</span>
+          Quick Play
+        </h2>
+        <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+          <button className="btn btn--primary" onClick={() => handleJoinRoom(null, 100)} disabled={joining}>
+            🧠 Quiz Match (₹100)
+          </button>
+          <button className="btn btn--accent" onClick={() => {
+            if (balance < 100) { navigate('/wallet'); return; }
+            setJoining(true);
+            roomAPI.join({ entryFee: 100, gameType: 'shooter' })
+              .then(res => navigate(`/lobby/${res.data.room.id}`))
+              .catch(err => toast.error('Failed to join room'))
+              .finally(() => setJoining(false));
+          }} disabled={joining}>
+            🔫 Shooter Arena (₹100)
+          </button>
+          <button className="btn" style={{ background: '#00ff64', color: '#000', fontWeight: 700 }} onClick={() => {
+            if (balance < 100) { navigate('/wallet'); return; }
+            setJoining(true);
+            roomAPI.join({ entryFee: 100, gameType: 'mines' })
+              .then(res => navigate(`/lobby/${res.data.room.id}`))
+              .catch(err => toast.error('Failed to join room'))
+              .finally(() => setJoining(false));
+          }} disabled={joining}>
+            💣 Mines Jackpot (₹100)
+          </button>
+        </div>
+
         {/* Arena Room */}
         <h2 className="home__section-title">
           <span className="home__section-icon">⚡</span>
@@ -134,7 +165,7 @@ const HomePage = () => {
                     {isFull ? 'FULL' : 'WAITING'}
                   </div>
                   <div className="home__arena-tier" style={{ textTransform: 'uppercase' }}>
-                    {room.gameType === 'shooter' ? '🔫 SHOOTER ' : '🧠 QUIZ '}
+                    {room.gameType === 'shooter' ? '🔫 SHOOTER ' : room.gameType === 'mines' ? '💣 MINES ' : '🧠 QUIZ '}
                     #{room.roomCode}
                   </div>
                 </div>
