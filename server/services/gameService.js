@@ -53,6 +53,7 @@ class GameService {
     } catch (error) {
       console.error('Error in startCountdown:', error);
       this.activeCountdowns.delete(roomId);
+      this.io.to(roomId).emit('error_msg', 'A database error occurred while trying to start the countdown. Please try again.');
     }
   }
 
@@ -77,7 +78,7 @@ class GameService {
       ]);
 
       if (questions.length === 0) {
-        this.io.to(roomId).emit('quiz:error', { message: 'Not enough questions available' });
+        this.io.to(roomId).emit('error_msg', 'Not enough questions available in the database to start the quiz. Please contact the administrator.');
         return;
       }
 
@@ -125,6 +126,7 @@ class GameService {
       }, 1000);
     } catch (error) {
       console.error('Error starting quiz:', error);
+      this.io.to(roomId).emit('error_msg', 'A database error occurred while trying to start the quiz. Please check your MongoDB connection or try again later.');
     }
   }
 
