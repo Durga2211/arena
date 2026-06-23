@@ -85,7 +85,15 @@ const setupSocket = (io) => {
           }
         }
 
-        // Check if room is full
+        // If room is in countdown, sync the late-joining player
+        if (room.status === 'countdown') {
+          const countdownState = gameService.activeCountdowns.get(roomId);
+          if (countdownState) {
+            socket.emit('room:countdown', { seconds: countdownState.remaining });
+          }
+        }
+
+        // Check if room is full and still waiting (backup trigger)
         if (room.players.length >= (room.maxPlayers || 10) && room.status === 'waiting') {
           io.to(roomId).emit('room:full', {});
           await gameService.startCountdown(roomId);

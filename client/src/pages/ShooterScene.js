@@ -155,7 +155,8 @@ export default class ShooterScene extends Phaser.Scene {
   }
 
   connectSocket() {
-    const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001';
+    const socketUrl = import.meta.env.VITE_SOCKET_URL
+      || (import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/\/api\/?$/, '') : 'http://localhost:5001');
     this.socket = io(`${socketUrl}/shooter`, {
       auth: { token: this.token, roomId: this.roomId },
     });

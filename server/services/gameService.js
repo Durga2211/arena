@@ -13,9 +13,13 @@ class GameService {
   constructor(io) {
     this.io = io;
     this.activeGames = new Map(); // roomId -> game state
+    this.activeCountdowns = new Map(); // roomId -> { endTime }
   }
 
   async startCountdown(roomId) {
+    // Prevent double-start
+    if (this.activeCountdowns.has(roomId)) return;
+
     const room = await Room.findById(roomId);
     if (!room || room.status !== 'waiting') return;
 
@@ -23,12 +27,16 @@ class GameService {
     await room.save();
 
     let count = COUNTDOWN_SECONDS;
+    this.activeCountdowns.set(roomId, { remaining: count });
+
     const countdownInterval = setInterval(async () => {
       this.io.to(roomId).emit('room:countdown', { seconds: count });
+      this.activeCountdowns.set(roomId, { remaining: count });
       count--;
 
       if (count < 0) {
         clearInterval(countdownInterval);
+        this.activeCountdowns.delete(roomId);
         if (room.gameType === 'shooter') {
           await this.startShooter(roomId);
         } else {
