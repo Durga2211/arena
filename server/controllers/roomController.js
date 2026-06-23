@@ -126,6 +126,8 @@ exports.joinRoom = async (req, res, next) => {
     await room.save();
 
     const io = req.app.get('io');
+    const gameService = req.app.get('gameService');
+
     if (io) {
       io.emit('room:update', {
         id: room._id,
@@ -133,6 +135,12 @@ exports.joinRoom = async (req, res, next) => {
         prizePool: room.prizePool,
         status: room.players.length >= (room.maxPlayers || 10) ? 'countdown' : room.status,
       });
+    }
+
+    // If the room is now full, trigger countdown immediately
+    if (room.players.length >= (room.maxPlayers || 10) && room.status === 'waiting' && gameService) {
+      io.to(room._id.toString()).emit('room:full', {});
+      gameService.startCountdown(room._id.toString());
     }
 
     res.json({
