@@ -8,7 +8,7 @@ const QUICK_AMOUNTS = [100, 200, 500, 1000, 2000, 5000];
 const TXN_ICONS = { deposit: '📥', entry_fee: '🎮', prize: '🏆', withdrawal: '📤' };
 
 const WalletPage = () => {
-  const { balance, transactions, loadingTxns, fetchTransactions, refreshBalance, withdraw } = useWallet();
+  const { balance, depositBalance, winningsBalance, transactions, loadingTxns, fetchTransactions, refreshBalance, withdraw } = useWallet();
   const [addAmount, setAddAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [upiId, setUpiId] = useState('');
@@ -88,8 +88,25 @@ const WalletPage = () => {
       toast.error('Please enter your UPI ID');
       return;
     }
+    const upiRegex = /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/;
+    if (!upiRegex.test(upiId)) {
+      toast.error('Please enter a valid UPI ID');
+      return;
+    }
+
     if (!phone) {
       toast.error('Please enter your Phone Number');
+      return;
+    }
+    
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (!phoneRegex.test(phone)) {
+      toast.error('Please enter a valid 10-digit Indian phone number');
+      return;
+    }
+
+    const confirmMessage = `WARNING: You are about to withdraw ₹${amount}.\n\nPlease double check your details:\nUPI ID: ${upiId}\nPhone: ${phone}\n\nAre you absolutely sure these details are correct? Transactions cannot be reversed.`;
+    if (!window.confirm(confirmMessage)) {
       return;
     }
 
@@ -123,17 +140,25 @@ const WalletPage = () => {
         </div>
 
         <div className="wallet__grid">
-          {/* Balance Card */}
-          <div className="wallet__balance-card glass-card">
-            <div className="wallet__balance-label">Available Balance</div>
-            <div className="wallet__balance-amount">₹{balance.toLocaleString('en-IN')}</div>
-            <div className="wallet__balance-actions">
-              <button className="btn btn--accent btn--sm" onClick={() => document.getElementById('add-money-input').focus()}>
-                + Add Money
-              </button>
-              <button className="btn btn--outline btn--sm" onClick={() => document.getElementById('withdraw-input').focus()}>
-                Withdraw
-              </button>
+          {/* Balances */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+            <div className="wallet__balance-card glass-card">
+              <div className="wallet__balance-label">Deposit Balance <span style={{fontSize: '0.8rem', color: 'var(--text-secondary)'}}>(Non-Withdrawable)</span></div>
+              <div className="wallet__balance-amount">₹{(depositBalance || 0).toLocaleString('en-IN')}</div>
+              <div className="wallet__balance-actions">
+                <button className="btn btn--accent btn--sm" onClick={() => document.getElementById('add-money-input').focus()}>
+                  + Add Money
+                </button>
+              </div>
+            </div>
+            <div className="wallet__balance-card glass-card" style={{ borderColor: 'var(--success)' }}>
+              <div className="wallet__balance-label" style={{ color: 'var(--success)' }}>Winnings Balance <span style={{fontSize: '0.8rem', color: 'var(--text-secondary)'}}>(Withdrawable)</span></div>
+              <div className="wallet__balance-amount" style={{ color: 'var(--success)' }}>₹{(winningsBalance || 0).toLocaleString('en-IN')}</div>
+              <div className="wallet__balance-actions">
+                <button className="btn btn--outline btn--sm" style={{ borderColor: 'var(--success)', color: 'var(--success)' }} onClick={() => document.getElementById('withdraw-input').focus()}>
+                  Withdraw Winnings
+                </button>
+              </div>
             </div>
           </div>
 
@@ -207,6 +232,9 @@ const WalletPage = () => {
               {loadingWithdraw ? <span className="spinner spinner--sm"></span> : 'Withdraw'}
             </button>
           </div>
+          <p style={{ marginTop: 'var(--space-md)', fontSize: '0.85rem', color: 'var(--text-secondary)', textAlign: 'center', backgroundColor: 'rgba(0,0,0,0.3)', padding: '10px', borderRadius: '4px', borderLeft: '3px solid var(--accent)' }}>
+            <strong>Rule B:</strong> Withdrawals are processed within 12-24 hours of request completion.
+          </p>
         </div>
 
         {/* Transactions */}

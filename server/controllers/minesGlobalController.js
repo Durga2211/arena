@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 const Settings = require('../models/Settings');
 const MinesGlobalEntry = require('../models/MinesGlobalEntry');
+const walletService = require('../services/walletService');
 
 // Simple seeded random function
 const seededRandom = (seed) => {
@@ -77,8 +78,10 @@ exports.joinRound = async (req, res, next) => {
     }
 
     // Deduct fee
-    user.walletBalance -= config.entryFee;
-    await user.save();
+    const deductSuccess = await walletService.deductEntryFee(req.user.id, config.entryFee);
+    if (!deductSuccess) {
+      return res.status(400).json({ message: 'Insufficient wallet balance.' });
+    }
 
     await Transaction.create({
       userId: user._id,
@@ -157,6 +160,7 @@ exports.submitRound = async (req, res, next) => {
     if (prize > 0) {
       const user = await User.findById(req.user.id);
       user.walletBalance += prize;
+      user.winningsBalance += prize;
       user.totalEarnings += prize;
       if (userRank === 1) user.totalWins += 1;
       await user.save();

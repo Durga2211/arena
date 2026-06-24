@@ -8,7 +8,7 @@ const razorpay = require('../config/razorpay');
 exports.getBalance = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
-    res.json({ success: true, balance: user.walletBalance });
+    res.json({ success: true, balance: user.walletBalance, depositBalance: user.depositBalance, winningsBalance: user.winningsBalance });
   } catch (error) {
     next(error);
   }
@@ -98,6 +98,8 @@ exports.verifyPayment = async (req, res, next) => {
       success: true,
       message: `₹${transaction.amount} added to wallet`,
       balance: user.walletBalance,
+      depositBalance: user.depositBalance,
+      winningsBalance: user.winningsBalance,
     });
   } catch (error) {
     next(error);
@@ -117,18 +119,27 @@ exports.withdraw = async (req, res, next) => {
     if (!upiId) {
       return res.status(400).json({ message: 'UPI ID is required' });
     }
+    const upiRegex = /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/;
+    if (!upiRegex.test(upiId)) {
+      return res.status(400).json({ message: 'Please provide a valid UPI ID (e.g., yourname@bank)' });
+    }
 
     if (!phone) {
       return res.status(400).json({ message: 'Phone number is required' });
     }
-
-    const user = await User.findById(req.user.id);
-    if (user.walletBalance < amount) {
-      return res.status(400).json({ message: 'Insufficient balance' });
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (!phoneRegex.test(phone)) {
+      return res.status(400).json({ message: 'Please provide a valid 10-digit Indian phone number' });
     }
 
-    // Deduct from wallet
+    const user = await User.findById(req.user.id);
+    if (user.winningsBalance < amount) {
+      return res.status(400).json({ message: 'Insufficient winnings balance. You can only withdraw winnings.' });
+    }
+
+    // Deduct from wallet and winnings balance
     user.walletBalance -= amount;
+    user.winningsBalance -= amount;
     await user.save();
 
     // Create withdrawal transaction
@@ -146,6 +157,8 @@ exports.withdraw = async (req, res, next) => {
       success: true,
       message: `Withdrawal of ₹${amount} initiated. Will be processed within 24 hours.`,
       balance: user.walletBalance,
+      depositBalance: user.depositBalance,
+      winningsBalance: user.winningsBalance,
     });
   } catch (error) {
     next(error);

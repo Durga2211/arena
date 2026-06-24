@@ -29,6 +29,16 @@ const userSchema = new mongoose.Schema({
     default: 0,
     min: 0,
   },
+  depositBalance: {
+    type: Number,
+    default: 0,
+    min: 0,
+  },
+  winningsBalance: {
+    type: Number,
+    default: 0,
+    min: 0,
+  },
   totalGamesPlayed: {
     type: Number,
     default: 0,

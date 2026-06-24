@@ -1,5 +1,6 @@
 const Room = require('../models/Room');
 const User = require('../models/User');
+const walletService = require('../services/walletService');
 
 class MatchmakingHandler {
   constructor(io) {
@@ -116,7 +117,7 @@ class MatchmakingHandler {
       // Deduct specific entry fees from all players
       const Transaction = require('../models/Transaction');
       for (const p of playersList) {
-        await User.findByIdAndUpdate(p.userId, { $inc: { walletBalance: -p.betAmount } });
+        await walletService.deductEntryFee(p.userId, p.betAmount);
         await Transaction.create({
           userId: p.userId,
           type: 'entry_fee',

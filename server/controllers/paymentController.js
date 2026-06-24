@@ -68,13 +68,20 @@ exports.verifyPayment = async (req, res, next) => {
 
     const amountToAdd = order.amount / 100; // Razorpay amount is in paise
 
-    const user = await User.findById(req.user.id);
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { 
+        $inc: { 
+          walletBalance: amountToAdd,
+          depositBalance: amountToAdd
+        } 
+      },
+      { new: true }
+    );
+    
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-
-    user.walletBalance += amountToAdd;
-    await user.save();
 
     // Create a deposit transaction record
     await Transaction.create({
@@ -90,7 +97,9 @@ exports.verifyPayment = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: 'Payment verified and funds added successfully',
-      walletBalance: user.walletBalance,
+      balance: user.walletBalance,
+      depositBalance: user.depositBalance,
+      winningsBalance: user.winningsBalance,
     });
   } catch (error) {
     console.error('Razorpay Verify Error:', error);

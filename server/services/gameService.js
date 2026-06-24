@@ -459,6 +459,7 @@ class GameService {
           await User.findByIdAndUpdate(result.userId, {
             $inc: {
               walletBalance: result.prize,
+              winningsBalance: result.prize,
               totalEarnings: result.prize,
               totalWins: result.rank === 1 ? 1 : 0,
             },

@@ -3,6 +3,7 @@ const { ShooterState, Player, Bullet } = require('./schema/ShooterState');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Transaction = require('../models/Transaction');
+const walletService = require('../services/walletService');
 
 class ShooterRoom extends Room {
   async onCreate(options) {
@@ -58,7 +59,10 @@ class ShooterRoom extends Room {
       }
 
       // Deduct fee and save
-      user.walletBalance -= ENTRY_FEE;
+      const deductSuccess = await walletService.deductEntryFee(user._id, ENTRY_FEE);
+      if (!deductSuccess) {
+        throw new Error("Insufficient balance");
+      }
       user.totalGamesPlayed += 1;
       await user.save();
 
@@ -166,6 +170,7 @@ class ShooterRoom extends Room {
         const user = await User.findById(winner.userId);
         if (user) {
           user.walletBalance += PRIZE;
+          user.winningsBalance += PRIZE;
           user.totalWins += 1;
           user.totalEarnings += PRIZE;
           await user.save();

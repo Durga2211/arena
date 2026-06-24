@@ -1,6 +1,7 @@
 const Room = require('../models/Room');
 const User = require('../models/User');
 const Transaction = require('../models/Transaction');
+const walletService = require('../services/walletService');
 const Settings = require('../models/Settings');
 
 // @desc    Get public game settings
@@ -135,9 +136,11 @@ exports.joinRoom = async (req, res, next) => {
       return res.status(400).json({ message: 'Already in this room' });
     }
 
-    // Deduct entry fee from wallet
-    user.walletBalance -= room.entryFee;
-    await user.save();
+    // Deduct entry fee from wallet using walletService
+    const deductSuccess = await walletService.deductEntryFee(req.user.id, room.entryFee);
+    if (!deductSuccess) {
+      return res.status(400).json({ message: 'Insufficient wallet balance' });
+    }
 
     // Create entry fee transaction
     await Transaction.create({
@@ -266,8 +269,11 @@ exports.createCustomMinesRoom = async (req, res, next) => {
       }]
     });
 
-    user.walletBalance -= entryFee;
-    await user.save();
+    // Deduct entry fee
+    const deductSuccess = await walletService.deductEntryFee(req.user.id, entryFee);
+    if (!deductSuccess) {
+      return res.status(400).json({ message: 'Insufficient wallet balance' });
+    }
 
     await Transaction.create({
       userId: req.user.id,

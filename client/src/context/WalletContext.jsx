@@ -16,11 +16,13 @@ export const WalletProvider = ({ children }) => {
   const [loadingTxns, setLoadingTxns] = useState(false);
 
   const balance = user?.walletBalance || 0;
+  const depositBalance = user?.depositBalance || 0;
+  const winningsBalance = user?.winningsBalance || 0;
 
   const refreshBalance = useCallback(async () => {
     try {
       const { data } = await walletAPI.getBalance();
-      updateUser({ walletBalance: data.balance });
+      updateUser({ walletBalance: data.balance, depositBalance: data.depositBalance, winningsBalance: data.winningsBalance });
     } catch (err) {
       console.error('Failed to refresh balance:', err);
     }
@@ -45,27 +47,18 @@ export const WalletProvider = ({ children }) => {
 
   const verifyPayment = async (paymentData) => {
     const { data } = await walletAPI.verifyPayment(paymentData);
-    updateUser({ walletBalance: data.balance });
+    updateUser({ walletBalance: data.balance, depositBalance: data.depositBalance, winningsBalance: data.winningsBalance });
     return data;
   };
 
   const withdraw = async (amount, upiId, phone) => {
     const { data } = await walletAPI.withdraw({ amount, upiId, phone });
-    updateUser({ walletBalance: data.balance });
+    updateUser({ walletBalance: data.balance, depositBalance: data.depositBalance, winningsBalance: data.winningsBalance });
     return data;
   };
 
   return (
-    <WalletContext.Provider value={{
-      balance,
-      transactions,
-      loadingTxns,
-      refreshBalance,
-      fetchTransactions,
-      addMoney,
-      verifyPayment,
-      withdraw,
-    }}>
+    <WalletContext.Provider value={{ balance, depositBalance, winningsBalance, transactions, loadingTxns, fetchTransactions, refreshBalance, addMoney, verifyPayment, withdraw }}>
       {children}
     </WalletContext.Provider>
   );
