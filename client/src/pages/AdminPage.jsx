@@ -10,6 +10,8 @@ const AdminPage = () => {
   const [transactions, setTransactions] = useState([]);
   const [activeRooms, setActiveRooms] = useState([]);
   const [withdrawals, setWithdrawals] = useState([]);
+  const [settings, setSettings] = useState({ quiz: true, shooter: true, mines: true });
+  const [minesGlobalConfig, setMinesGlobalConfig] = useState({ entryFee: 50, totalPlayers: 10, winnerPrizePercent: 50, loserPrizePercent: 1 });
   const [loading, setLoading] = useState(false);
 
   const [activeTab, setActiveTab] = useState('overview');
@@ -51,16 +53,23 @@ const AdminPage = () => {
   const fetchDashboardData = async (pwd) => {
     try {
       setLoading(true);
-      const [statsRes, txnsRes, roomsRes, withdrawalsRes] = await Promise.all([
+      const [statsRes, txnsRes, roomsRes, withdrawalsRes, settingsRes] = await Promise.all([
         adminAPI.getStats(pwd || password),
         adminAPI.getTransactions(pwd || password),
         adminAPI.getActiveRooms(pwd || password),
         adminAPI.getWithdrawals(pwd || password),
+        adminAPI.getSettings(pwd || password),
       ]);
       setStats(statsRes.data.stats);
       setTransactions(txnsRes.data.transactions);
       setActiveRooms(roomsRes.data.rooms);
       setWithdrawals(withdrawalsRes.data.withdrawals);
+      if (settingsRes.data.settings?.enabledGames) {
+        setSettings(settingsRes.data.settings.enabledGames);
+      }
+      if (settingsRes.data.settings?.minesGlobalConfig) {
+        setMinesGlobalConfig(settingsRes.data.settings.minesGlobalConfig);
+      }
     } catch (error) {
       console.error('Error fetching admin data:', error);
       if (error.response?.status === 403) {
@@ -72,6 +81,36 @@ const AdminPage = () => {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleToggleGame = async (gameType, currentValue) => {
+    try {
+      const updatedGames = { ...settings, [gameType]: !currentValue };
+      const res = await adminAPI.updateSettings(password, { enabledGames: updatedGames });
+      if (res.data.success) {
+        setSettings(res.data.settings.enabledGames);
+        toast.success(`${gameType} has been ${!currentValue ? 'enabled' : 'disabled'}!`);
+      }
+    } catch (error) {
+      console.error('Error updating settings:', error);
+      toast.error('Failed to update game settings');
+    }
+  };
+
+  const handleUpdateMinesGlobalConfig = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await adminAPI.updateSettings(password, { minesGlobalConfig });
+      if (res.data.success) {
+        toast.success('Mines Global Config updated!');
+        if (res.data.settings?.minesGlobalConfig) {
+          setMinesGlobalConfig(res.data.settings.minesGlobalConfig);
+        }
+      }
+    } catch (error) {
+      console.error('Error updating global config:', error);
+      toast.error('Failed to update config');
     }
   };
 
@@ -195,6 +234,7 @@ const AdminPage = () => {
           <button className={`admin-tab ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>Overview</button>
           <button className={`admin-tab ${activeTab === 'liverooms' ? 'active' : ''}`} onClick={() => setActiveTab('liverooms')}>Live Rooms</button>
           <button className={`admin-tab ${activeTab === 'customrooms' ? 'active' : ''}`} onClick={() => setActiveTab('customrooms')}>Create Room</button>
+          <button className={`admin-tab ${activeTab === 'config' ? 'active' : ''}`} onClick={() => setActiveTab('config')}>Game Config</button>
           <button className={`admin-tab ${activeTab === 'withdrawals' ? 'active' : ''}`} onClick={() => setActiveTab('withdrawals')}>
             Withdrawals
             {withdrawals.length > 0 && <span className="admin-tab-badge">{withdrawals.length}</span>}
@@ -394,6 +434,117 @@ const AdminPage = () => {
                   {creatingRoom ? 'Creating...' : 'Create Room'}
                 </button>
               </form>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'config' && (
+          <div className="admin-tab-content animate-fadeInUp">
+            <div className="admin-transactions-section glass-card">
+              <h2>🎮 Global Game Configuration</h2>
+              <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-lg)' }}>
+                Enable or disable game modes across the entire platform. Disabled games will not appear on the home page, and players will not be able to join them.
+              </p>
+              
+              <div className="admin-config-grid" style={{ display: 'grid', gap: 'var(--space-md)' }}>
+                
+                {/* Quiz Game Toggle */}
+                <div className="admin-config-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--space-md)', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
+                  <div>
+                    <h3 style={{ margin: '0 0 4px 0', fontSize: 'var(--font-md)' }}>🧠 Quiz Match</h3>
+                    <p style={{ margin: 0, fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>Classic multiple-choice trivia matches.</p>
+                  </div>
+                  <button 
+                    className={`btn ${settings?.quiz ? 'btn--primary' : 'btn--outline'}`}
+                    onClick={() => handleToggleGame('quiz', settings?.quiz)}
+                  >
+                    {settings?.quiz ? 'Enabled' : 'Disabled'}
+                  </button>
+                </div>
+
+                {/* Shooter Toggle */}
+                <div className="admin-config-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--space-md)', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
+                  <div>
+                    <h3 style={{ margin: '0 0 4px 0', fontSize: 'var(--font-md)' }}>🔫 Shooter Arena</h3>
+                    <p style={{ margin: 0, fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>Reflex-based target shooting game.</p>
+                  </div>
+                  <button 
+                    className={`btn ${settings?.shooter ? 'btn--accent' : 'btn--outline'}`}
+                    onClick={() => handleToggleGame('shooter', settings?.shooter)}
+                  >
+                    {settings?.shooter ? 'Enabled' : 'Disabled'}
+                  </button>
+                </div>
+
+                <div className="admin-config-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--space-md)', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
+                  <div>
+                    <h3 style={{ margin: '0 0 4px 0', fontSize: 'var(--font-md)' }}>💣 Mines Jackpot</h3>
+                    <p style={{ margin: 0, fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>Standard Multiplayer Arena.</p>
+                  </div>
+                  <button 
+                    className={`btn ${settings?.minesJackpot !== false ? 'btn--success' : 'btn--outline'}`}
+                    style={{ background: settings?.minesJackpot !== false ? '#00ff64' : 'transparent', color: settings?.minesJackpot !== false ? '#000' : '' }}
+                    onClick={() => handleToggleGame('minesJackpot', settings?.minesJackpot !== false)}
+                  >
+                    {settings?.minesJackpot !== false ? 'Enabled' : 'Disabled'}
+                  </button>
+                </div>
+
+                <div className="admin-config-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--space-md)', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
+                  <div>
+                    <h3 style={{ margin: '0 0 4px 0', fontSize: 'var(--font-md)' }}>⚔️ Mines Duels</h3>
+                    <p style={{ margin: 0, fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>Private 1v1 Matches.</p>
+                  </div>
+                  <button 
+                    className={`btn ${settings?.minesDuels !== false ? 'btn--success' : 'btn--outline'}`}
+                    style={{ background: settings?.minesDuels !== false ? '#00ff64' : 'transparent', color: settings?.minesDuels !== false ? '#000' : '' }}
+                    onClick={() => handleToggleGame('minesDuels', settings?.minesDuels !== false)}
+                  >
+                    {settings?.minesDuels !== false ? 'Enabled' : 'Disabled'}
+                  </button>
+                </div>
+
+                <div className="admin-config-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--space-md)', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
+                  <div>
+                    <h3 style={{ margin: '0 0 4px 0', fontSize: 'var(--font-md)' }}>🌍 Global Timeline</h3>
+                    <p style={{ margin: 0, fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>Single-player Sync Mode.</p>
+                  </div>
+                  <button 
+                    className={`btn ${settings?.minesGlobalTimeline !== false ? 'btn--success' : 'btn--outline'}`}
+                    style={{ background: settings?.minesGlobalTimeline !== false ? '#d400ff' : 'transparent', color: settings?.minesGlobalTimeline !== false ? '#fff' : '', borderColor: settings?.minesGlobalTimeline !== false ? '#d400ff' : '' }}
+                    onClick={() => handleToggleGame('minesGlobalTimeline', settings?.minesGlobalTimeline !== false)}
+                  >
+                    {settings?.minesGlobalTimeline !== false ? 'Enabled' : 'Disabled'}
+                  </button>
+                </div>
+
+              </div>
+
+              <h2 style={{ marginTop: 'var(--space-2xl)' }}>🌍 Mines Global Timeline Settings</h2>
+              <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-lg)' }}>
+                Configure the parameters for the continuous single-player global mode.
+              </p>
+              
+              <form onSubmit={handleUpdateMinesGlobalConfig} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+                <div className="input-group">
+                  <label>Entry Fee (₹)</label>
+                  <input type="number" className="input" value={minesGlobalConfig.entryFee} onChange={(e) => setMinesGlobalConfig({...minesGlobalConfig, entryFee: Number(e.target.value)})} required min="10" />
+                </div>
+                <div className="input-group">
+                  <label>Simulated Players per Room</label>
+                  <input type="number" className="input" value={minesGlobalConfig.totalPlayers} onChange={(e) => setMinesGlobalConfig({...minesGlobalConfig, totalPlayers: Number(e.target.value)})} required min="2" max="100" />
+                </div>
+                <div className="input-group">
+                  <label>Winner Prize (%)</label>
+                  <input type="number" className="input" value={minesGlobalConfig.winnerPrizePercent} onChange={(e) => setMinesGlobalConfig({...minesGlobalConfig, winnerPrizePercent: Number(e.target.value)})} required min="0" max="100" />
+                </div>
+                <div className="input-group">
+                  <label>Loser Consolation Prize (%)</label>
+                  <input type="number" className="input" value={minesGlobalConfig.loserPrizePercent} onChange={(e) => setMinesGlobalConfig({...minesGlobalConfig, loserPrizePercent: Number(e.target.value)})} required min="0" max="100" />
+                </div>
+                <button type="submit" className="btn btn--primary" style={{ alignSelf: 'flex-start' }}>Save Global Settings</button>
+              </form>
+
             </div>
           </div>
         )}

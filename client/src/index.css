@@ -921,3 +921,38 @@ input, select, textarea {
   right: -1px;
   border-width: 0 2px 2px 0;
 }
+
+/* =======================================
+   MODAL COMPONENT
+   ======================================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  position: relative;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+.modal-close-btn {
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.modal-close-btn:hover {
+  transform: scale(1.1);
+  color: var(--danger) !important;
+}

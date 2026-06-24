@@ -70,13 +70,20 @@ export const walletAPI = {
   getTransactions: () => api.get('/wallet/transactions'),
 };
 
+// Global Mines Timelime
+export const joinGlobalMines = () => api.post('/mines-global/join');
+export const submitGlobalMines = (roundId, gems, survivalTime) => api.post('/mines-global/submit', { roundId, gems, survivalTime });
+
 // Room API
 export const roomAPI = {
+  getSettings: () => api.get('/rooms/settings'),
   getAvailable: () => api.get('/rooms/available'),
   join: (entryFeeOrData) => {
     const data = typeof entryFeeOrData === 'object' ? entryFeeOrData : { entryFee: entryFeeOrData };
     return api.post('/rooms/join', data);
   },
+  createCustomMinesRoom: (data) => api.post('/rooms/mines/custom', data),
+  joinRoomByCode: (roomCode) => api.post('/rooms/mines/join-by-code', { roomCode }),
   leave: (roomId) => api.post(`/rooms/${roomId}/leave`),
   getDetails: (roomId) => api.get(`/rooms/${roomId}`),
   getHistory: () => api.get('/rooms/history'),
@@ -93,6 +100,8 @@ export const paymentAPI = {
 };
 
 export const adminAPI = {
+  getSettings: (password) => api.get('/admin/settings', { headers: { 'x-admin-password': password } }),
+  updateSettings: (password, data) => api.put('/admin/settings', data, { headers: { 'x-admin-password': password } }),
   getStats: (password) => api.get('/admin/stats', { headers: { 'x-admin-password': password } }),
   getTransactions: (password) => api.get('/admin/transactions', { headers: { 'x-admin-password': password } }),
   getActiveRooms: (password) => api.get('/admin/rooms', { headers: { 'x-admin-password': password } }),

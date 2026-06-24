@@ -19,6 +19,13 @@ const HomePage = () => {
   const [joining, setJoining] = useState(false);
   const [recentGames, setRecentGames] = useState([]);
   const [availableRooms, setAvailableRooms] = useState([]);
+  const [enabledGames, setEnabledGames] = useState({ quiz: true, shooter: true, mines: true });
+
+  // Custom Mines State
+  const [showMinesModal, setShowMinesModal] = useState(false);
+  const [roomCodeInput, setRoomCodeInput] = useState('');
+  const [customEntryFee, setCustomEntryFee] = useState(50);
+  const [customMaxPlayers, setCustomMaxPlayers] = useState(2);
 
   useEffect(() => {
     if (document.exitFullscreen) document.exitFullscreen().catch(()=>{});
@@ -47,12 +54,16 @@ const HomePage = () => {
 
   const loadData = async () => {
     try {
-      const [roomsRes, historyRes] = await Promise.all([
+      const [roomsRes, historyRes, settingsRes] = await Promise.all([
         roomAPI.getAvailable(),
         roomAPI.getHistory(),
+        roomAPI.getSettings()
       ]);
       setAvailableRooms(roomsRes.data.rooms);
       setRecentGames(historyRes.data.history);
+      if (settingsRes.data.enabledGames) {
+        setEnabledGames(settingsRes.data.enabledGames);
+      }
     } catch (err) {
       console.error('Failed to load data:', err);
     }
@@ -75,6 +86,46 @@ const HomePage = () => {
       toast.error(err.response?.data?.message || 'Failed to join room');
     } finally {
       setJoining(false);
+    }
+  };
+
+  const handleCreateCustomMines = async (e) => {
+    e.preventDefault();
+    if (balance < customEntryFee) {
+      toast.error(`Insufficient balance. You need ₹${customEntryFee} to create this room.`);
+      navigate('/wallet');
+      return;
+    }
+    try {
+      setJoining(true);
+      const { data } = await roomAPI.createCustomMinesRoom({ entryFee: customEntryFee, maxPlayers: customMaxPlayers });
+      toast.success(customMaxPlayers === 2 ? 'Duel room created!' : 'Jackpot room created!');
+      navigate(`/lobby/${data.room.id}`);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to create custom room');
+    } finally {
+      setJoining(false);
+      setShowMinesModal(false);
+    }
+  };
+
+  const handleJoinCustomMines = async (e) => {
+    e.preventDefault();
+    if (!roomCodeInput || roomCodeInput.length !== 4) {
+      toast.error('Please enter a valid 4-character room code.');
+      return;
+    }
+    try {
+      setJoining(true);
+      const { data } = await roomAPI.joinRoomByCode(roomCodeInput);
+      toast.success('Joined custom room!');
+      navigate(`/lobby/${data.room.id}`);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to join room');
+    } finally {
+      setJoining(false);
+      setShowMinesModal(false);
+      setRoomCodeInput('');
     }
   };
 
@@ -132,47 +183,85 @@ const HomePage = () => {
         <button className="home__view-all">View All &gt;</button>
       </div>
       <div className="home__quickplay-grid">
-        <div className="quick-play-card quick-play-card--quiz" onClick={() => handleJoinRoom(null, 100, 'quiz')}>
-          <div className="quick-play-card__content">
-            <div className="quick-play-card__icon">🧠⚡</div>
-            <div className="quick-play-card__info">
-              <h3>QUIZ MATCH</h3>
-              <p><span></span> ₹100 Entry</p>
+        {enabledGames.quiz && (
+          <div className="quick-play-card quick-play-card--quiz" onClick={() => handleJoinRoom(null, 100, 'quiz')}>
+            <div className="quick-play-card__content">
+              <div className="quick-play-card__icon">🧠⚡</div>
+              <div className="quick-play-card__info">
+                <h3>QUIZ MATCH</h3>
+                <p><span></span> ₹100 Entry</p>
+              </div>
+            </div>
+            <div className="quick-play-card__action">
+              <span>Play Now</span>
+              <HiOutlineArrowRight />
             </div>
           </div>
-          <div className="quick-play-card__action">
-            <span>Play Now</span>
-            <HiOutlineArrowRight />
-          </div>
-        </div>
+        )}
 
-        <div className="quick-play-card quick-play-card--shooter" onClick={() => handleJoinRoom(null, 100, 'shooter')}>
-          <div className="quick-play-card__content">
-            <div className="quick-play-card__icon">🔫🎯</div>
-            <div className="quick-play-card__info">
-              <h3>SHOOTER ARENA</h3>
-              <p><span></span> ₹100 Entry</p>
+        {enabledGames.shooter && (
+          <div className="quick-play-card quick-play-card--shooter" onClick={() => handleJoinRoom(null, 100, 'shooter')}>
+            <div className="quick-play-card__content">
+              <div className="quick-play-card__icon">🔫🎯</div>
+              <div className="quick-play-card__info">
+                <h3>SHOOTER ARENA</h3>
+                <p><span></span> ₹100 Entry</p>
+              </div>
+            </div>
+            <div className="quick-play-card__action">
+              <span>Play Now</span>
+              <HiOutlineArrowRight />
             </div>
           </div>
-          <div className="quick-play-card__action">
-            <span>Play Now</span>
-            <HiOutlineArrowRight />
-          </div>
-        </div>
+        )}
 
-        <div className="quick-play-card quick-play-card--mines" onClick={() => handleJoinRoom(null, 100, 'mines')}>
-          <div className="quick-play-card__content">
-            <div className="quick-play-card__icon">💣💀</div>
-            <div className="quick-play-card__info">
-              <h3>MINES JACKPOT</h3>
-              <p><span></span> ₹100 Entry</p>
+        {enabledGames.minesJackpot !== false && (
+          <div className="quick-play-card quick-play-card--mines" onClick={() => setShowMinesModal(true)}>
+            <div className="quick-play-card__content">
+              <div className="quick-play-card__icon">💣💀</div>
+              <div className="quick-play-card__info">
+                <h3>MINES JACKPOT</h3>
+                <p><span></span> Custom Match</p>
+              </div>
+            </div>
+            <div className="quick-play-card__action">
+              <span>Play Now</span>
+              <HiOutlineArrowRight />
             </div>
           </div>
-          <div className="quick-play-card__action">
-            <span>Play Now</span>
-            <HiOutlineArrowRight />
+        )}
+
+        {enabledGames.minesDuels !== false && (
+          <div className="quick-play-card" style={{ background: 'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)', border: '1px solid #00ff64' }} onClick={() => setShowMinesModal(true)}>
+            <div className="quick-play-card__content">
+              <div className="quick-play-card__icon">⚔️</div>
+              <div className="quick-play-card__info">
+                <h3 style={{ color: '#00ff64' }}>MINES DUELS</h3>
+                <p><span></span> ₹50 Entry (1v1)</p>
+              </div>
+            </div>
+            <div className="quick-play-card__action" style={{ color: '#00ff64' }}>
+              <span>Host/Join</span>
+              <HiOutlineArrowRight />
+            </div>
           </div>
-        </div>
+        )}
+
+        {enabledGames.minesGlobalTimeline !== false && (
+          <div className="quick-play-card" style={{ background: 'linear-gradient(135deg, #2b0042 0%, #590089 100%)', border: '1px solid #d400ff' }} onClick={() => navigate('/mines-global')}>
+            <div className="quick-play-card__content">
+              <div className="quick-play-card__icon">🌍⏳</div>
+              <div className="quick-play-card__info">
+                <h3 style={{ color: '#d400ff' }}>GLOBAL TIMELINE</h3>
+                <p><span></span> Live Sync Mode</p>
+              </div>
+            </div>
+            <div className="quick-play-card__action" style={{ color: '#d400ff' }}>
+              <span>Enter Lobby</span>
+              <HiOutlineArrowRight />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Available Rooms */}
@@ -275,6 +364,62 @@ const HomePage = () => {
           </div>
         )}
       </div>
+      {/* Custom Mines Modal */}
+      {showMinesModal && (
+        <div className="modal-overlay animate-fadeIn" onClick={() => setShowMinesModal(false)}>
+          <div className="modal-content glass-card animate-scaleIn" onClick={e => e.stopPropagation()} style={{ maxWidth: '450px', width: '90%', padding: 'var(--space-xl)' }}>
+            <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-lg)' }}>
+              <h2 style={{ margin: 0, fontSize: 'var(--font-xl)', color: '#00ff64' }}>💎 Custom Mines Room</h2>
+              <button className="modal-close-btn" onClick={() => setShowMinesModal(false)} style={{ background: 'none', border: 'none', fontSize: 'var(--font-xl)', color: 'var(--text-secondary)', cursor: 'pointer' }}>&times;</button>
+            </div>
+            
+            <p style={{ margin: '0 0 var(--space-lg) 0', color: 'var(--text-secondary)', fontSize: 'var(--font-sm)' }}>Create a customized room or join an existing one using a 4-character code.</p>
+                
+            <div style={{ display: 'flex', gap: 'var(--space-md)', flexDirection: 'column' }}>
+              
+              <div style={{ background: 'var(--bg-secondary)', padding: 'var(--space-md)', borderRadius: 'var(--radius-md)' }}>
+                <h3 style={{ margin: '0 0 var(--space-sm) 0', fontSize: '1rem' }}>Create Room</h3>
+                <div style={{ display: 'flex', gap: 'var(--space-sm)', marginBottom: 'var(--space-md)' }}>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Entry Fee (₹)</label>
+                    <input type="number" className="input" value={customEntryFee} onChange={(e) => setCustomEntryFee(Number(e.target.value))} min="50" style={{ width: '100%' }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Players (2-10)</label>
+                    <input type="number" className="input" value={customMaxPlayers} onChange={(e) => setCustomMaxPlayers(Number(e.target.value))} min="2" max="10" style={{ width: '100%' }} />
+                  </div>
+                </div>
+                <button className="btn btn--success" style={{ width: '100%', background: '#00ff64', color: '#000' }} onClick={handleCreateCustomMines} disabled={joining}>
+                  {joining ? 'Creating...' : `Create ${customMaxPlayers === 2 ? 'Duel' : 'Jackpot'} Room`}
+                </button>
+              </div>
+
+              <div style={{ textAlign: 'center', color: 'var(--text-secondary)', fontSize: 'var(--font-sm)' }}>OR</div>
+              
+              <div style={{ background: 'var(--bg-secondary)', padding: 'var(--space-md)', borderRadius: 'var(--radius-md)' }}>
+                <h3 style={{ margin: '0 0 var(--space-sm) 0', fontSize: '1rem' }}>Join Room</h3>
+                <div style={{ display: 'flex', gap: 'var(--space-xs)' }}>
+                  <input 
+                    type="text" 
+                    placeholder="4-Char Code" 
+                    maxLength={4}
+                    className="input" 
+                    style={{ flex: 1, textTransform: 'uppercase', letterSpacing: '2px', textAlign: 'center' }}
+                    value={roomCodeInput}
+                    onChange={(e) => setRoomCodeInput(e.target.value.toUpperCase())}
+                  />
+                  <button className="btn btn--outline" onClick={handleJoinCustomMines} disabled={joining}>
+                    {joining ? 'Joining...' : 'Join'}
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

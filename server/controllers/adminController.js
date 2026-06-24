@@ -1,6 +1,57 @@
 const Transaction = require('../models/Transaction');
 const User = require('../models/User');
 const Room = require('../models/Room');
+const Settings = require('../models/Settings');
+
+// Helper to ensure settings exist
+const getOrCreateSettings = async () => {
+  let settings = await Settings.findOne({ singletonData: 'global' });
+  if (!settings) {
+    settings = await Settings.create({ singletonData: 'global' });
+  }
+  return settings;
+};
+
+// @desc    Get global settings
+// @route   GET /api/admin/settings
+exports.getSettings = async (req, res, next) => {
+  try {
+    const settings = await getOrCreateSettings();
+    res.json({ success: true, settings });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Update global settings
+// @route   PUT /api/admin/settings
+exports.updateSettings = async (req, res, next) => {
+  try {
+    const { enabledGames, minesGlobalConfig } = req.body;
+    const settings = await getOrCreateSettings();
+    
+    if (enabledGames) {
+      if (typeof enabledGames.quiz === 'boolean') settings.enabledGames.quiz = enabledGames.quiz;
+      if (typeof enabledGames.shooter === 'boolean') settings.enabledGames.shooter = enabledGames.shooter;
+      if (typeof enabledGames.mines === 'boolean') settings.enabledGames.mines = enabledGames.mines;
+      if (typeof enabledGames.minesJackpot === 'boolean') settings.enabledGames.minesJackpot = enabledGames.minesJackpot;
+      if (typeof enabledGames.minesDuels === 'boolean') settings.enabledGames.minesDuels = enabledGames.minesDuels;
+      if (typeof enabledGames.minesGlobalTimeline === 'boolean') settings.enabledGames.minesGlobalTimeline = enabledGames.minesGlobalTimeline;
+    }
+
+    if (minesGlobalConfig) {
+      if (typeof minesGlobalConfig.entryFee === 'number') settings.minesGlobalConfig.entryFee = minesGlobalConfig.entryFee;
+      if (typeof minesGlobalConfig.totalPlayers === 'number') settings.minesGlobalConfig.totalPlayers = minesGlobalConfig.totalPlayers;
+      if (typeof minesGlobalConfig.winnerPrizePercent === 'number') settings.minesGlobalConfig.winnerPrizePercent = minesGlobalConfig.winnerPrizePercent;
+      if (typeof minesGlobalConfig.loserPrizePercent === 'number') settings.minesGlobalConfig.loserPrizePercent = minesGlobalConfig.loserPrizePercent;
+    }
+    
+    await settings.save();
+    res.json({ success: true, settings });
+  } catch (error) {
+    next(error);
+  }
+};
 
 // @desc    Get all transactions (deposits, entries, prizes, withdrawals)
 // @route   GET /api/admin/transactions

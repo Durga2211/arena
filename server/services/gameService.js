@@ -375,10 +375,29 @@ class GameService {
       const prizePool = room.entryFee * room.players.length;
       let totalPrizesDistributed = 0;
 
-      for (let i = 0; i < scores.length; i++) {
-        let prizeAmount = scores[i].rank === 1 ? prizePool * 0.5 : prizePool * 0.01;
-        scores[i].prize = prizeAmount;
-        totalPrizesDistributed += prizeAmount;
+      if (room.isDuel) {
+        // Duel Prize Pool: Winner gets 1.5x entry fee, Loser gets 0.1x entry fee
+        // Check for an absolute tie (same gems, same survival, same click time)
+        const isTie = scores.length === 2 && 
+                      scores[0].gems === scores[1].gems &&
+                      scores[0].survivalTime === scores[1].survivalTime &&
+                      scores[0].firstClickTime === scores[1].firstClickTime;
+        
+        for (let i = 0; i < scores.length; i++) {
+          if (isTie) {
+            scores[i].prize = room.entryFee; // Refund entry fee if exact tie
+          } else {
+            scores[i].prize = scores[i].rank === 1 ? (room.entryFee * 1.5) : (room.entryFee * 0.1);
+          }
+          totalPrizesDistributed += scores[i].prize;
+        }
+      } else {
+        // Regular Multiplayer Prize Logic
+        for (let i = 0; i < scores.length; i++) {
+          let prizeAmount = scores[i].rank === 1 ? prizePool * 0.5 : prizePool * 0.01;
+          scores[i].prize = prizeAmount;
+          totalPrizesDistributed += prizeAmount;
+        }
       }
 
       const platformFee = prizePool - totalPrizesDistributed;

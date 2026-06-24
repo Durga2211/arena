@@ -52,6 +52,7 @@ app.use('/api/rooms', require('./routes/rooms'));
 app.use('/api/leaderboard', require('./routes/leaderboard'));
 app.use('/api/payment', require('./routes/payment'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/mines-global', require('./routes/minesGlobal'));
 
 // Health check
 app.get('/api/health', (req, res) => {

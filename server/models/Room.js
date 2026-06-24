@@ -19,6 +19,10 @@ const roomSchema = new mongoose.Schema({
     type: Number,
     default: 10,
   },
+  isDuel: {
+    type: Boolean,
+    default: false,
+  },
   status: {
     type: String,
     enum: ['waiting', 'countdown', 'active', 'completed', 'cancelled'],
