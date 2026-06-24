@@ -1,0 +1,21 @@
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  padding-top: 80px; /* navbar height */
+}
+
+.app-main {
+  flex: 1;
+  margin-left: 250px; /* sidebar width */
+  width: calc(100% - 250px);
+  min-height: calc(100vh - 80px);
+  padding-bottom: var(--space-2xl);
+}
+
+@media (max-width: 768px) {
+  .app-main {
+    margin-left: 0;
+    width: 100%;
+    padding-bottom: calc(70px + var(--space-2xl)); /* bottom-nav height + spacing */
+  }
+}

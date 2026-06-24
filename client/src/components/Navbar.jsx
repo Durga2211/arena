@@ -2,12 +2,14 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useWallet } from '../context/WalletContext';
-import { HiOutlineHome, HiOutlineTrophy, HiOutlineWallet, HiOutlineUser, HiOutlineArrowRightOnRectangle } from 'react-icons/hi2';
+import { HiOutlineHome, HiOutlineTrophy, HiOutlineWallet, HiOutlineUser, HiOutlineArrowRightOnRectangle, HiOutlineSun, HiOutlineMoon } from 'react-icons/hi2';
+import { useTheme } from '../context/ThemeContext';
 import './Navbar.css';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const { balance } = useWallet();
+  const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
@@ -47,18 +49,14 @@ const Navbar = () => {
           SQUIZ<span style={{ color: 'var(--primary)' }}>.</span>
         </Link>
 
-        <div className="navbar__nav">
-          <Link to="/home" className={`navbar__link ${isActive('/home') ? 'navbar__link--active' : ''}`} onClick={handleNavClick}>
-            <HiOutlineHome style={{ marginRight: 4, verticalAlign: 'middle' }} />
-            Home
-          </Link>
-          <Link to="/leaderboard" className={`navbar__link ${isActive('/leaderboard') ? 'navbar__link--active' : ''}`} onClick={handleNavClick}>
-            <HiOutlineTrophy style={{ marginRight: 4, verticalAlign: 'middle' }} />
-            Leaderboard
-          </Link>
-        </div>
+        {/* Removed center nav for new layout */}
+        <div style={{ flex: 1 }}></div>
 
         <div className="navbar__right">
+          <button className="navbar__theme-toggle" onClick={toggleTheme} aria-label="Toggle Theme">
+            {theme === 'dark' ? <HiOutlineSun size={20} /> : <HiOutlineMoon size={20} />}
+          </button>
+
           <Link to="/wallet" className="navbar__wallet" id="wallet-pill" onClick={handleNavClick}>
             <span className="navbar__wallet-icon">💰</span>
             ₹{balance.toLocaleString('en-IN')}

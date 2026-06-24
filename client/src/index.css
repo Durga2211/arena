@@ -99,6 +99,39 @@
 }
 
 /* ═══════════════════════════════════════════════
+   DARK THEME TOKENS
+   ═══════════════════════════════════════════════ */
+[data-theme="dark"] {
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #121218;
+  --bg-surface: #14141e;
+  --bg-elevated: #1a1a24;
+  --bg-hover: #22222e;
+
+  --accent: #ffffff;
+  --accent-light: #f0f0f0;
+  --accent-dark: #fafafa;
+  --accent-glow: rgba(255, 255, 255, 0.06);
+
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --text-tertiary: #71717a;
+  --text-inverse: #111111;
+
+  --border-default: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.15);
+
+  --glass-bg: rgba(20, 20, 30, 0.7);
+  --glass-bg-hover: rgba(26, 26, 36, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: 12px;
+
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.7);
+}
+
+/* ═══════════════════════════════════════════════
    RESET & BASE
    ═══════════════════════════════════════════════ */
 
