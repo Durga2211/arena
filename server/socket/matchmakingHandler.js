@@ -114,8 +114,17 @@ class MatchmakingHandler {
       });
 
       // Deduct specific entry fees from all players
+      const Transaction = require('../models/Transaction');
       for (const p of playersList) {
         await User.findByIdAndUpdate(p.userId, { $inc: { walletBalance: -p.betAmount } });
+        await Transaction.create({
+          userId: p.userId,
+          type: 'entry_fee',
+          amount: p.betAmount,
+          status: 'completed',
+          roomId: room._id,
+          description: `Entry fee for Mines Arena match (Bet: ₹${p.betAmount})`
+        });
         // Send success event to socket so they transition to the game
         this.io.to(p.socketId).emit('queue:match_found', { roomId: room._id });
       }

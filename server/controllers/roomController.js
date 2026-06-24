@@ -398,8 +398,8 @@ exports.leaveRoom = async (req, res, next) => {
       return res.status(404).json({ message: 'Room not found' });
     }
 
-    if (room.status !== 'waiting' && room.status !== 'countdown') {
-      return res.status(400).json({ message: 'Cannot explicitly leave a room that has already started.' });
+    if (room.status !== 'waiting') {
+      return res.status(400).json({ message: 'Cannot explicitly leave a room once the match has started.' });
     }
 
     const playerIndex = room.players.findIndex(p => p.userId.toString() === req.user.id);

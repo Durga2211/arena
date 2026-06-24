@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { adminAPI } from '../services/api';
 import toast from 'react-hot-toast';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid } from 'recharts';
 import './AdminPage.css';
 
 const AdminPage = () => {
@@ -312,24 +313,75 @@ const AdminPage = () => {
                   <h2>Live Game Stats</h2>
                   <button className="btn btn--outline btn--sm" onClick={closeLiveStats}>Close Stats</button>
                 </div>
-                <div className="admin-stats-grid">
-                  <div className="admin-stat-card glass-card">
-                    <h3>Time Remaining</h3>
-                    <div className="admin-stat-value" style={{ color: liveStats.timeRemaining <= 10 ? 'var(--danger)' : 'var(--text-primary)' }}>
-                      {liveStats.timeRemaining}s
+                  <div className="admin-stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
+                    <div className="admin-stat-card glass-card">
+                      <h3>Status</h3>
+                      <div className="admin-stat-value" style={{ color: liveStats.status === 'countdown' ? 'var(--warning)' : (liveStats.timeRemaining <= 10 ? 'var(--danger)' : 'var(--success)'), fontSize: '1.5rem' }}>
+                        {liveStats.status === 'countdown' ? 'COUNTDOWN' : (liveStats.timeRemaining + 's')}
+                      </div>
+                    </div>
+                    <div className="admin-stat-card glass-card">
+                      <h3>Active Players</h3>
+                      <div className="admin-stat-value" style={{ fontSize: '1.5rem' }}>{liveStats.players.length} / {liveStats.roomDetails?.maxPlayers || 0}</div>
+                    </div>
+                    <div className="admin-stat-card glass-card">
+                      <h3>Game Mode</h3>
+                      <div className="admin-stat-value" style={{ fontSize: '1.5rem', textTransform: 'capitalize' }}>
+                        {liveStats.roomDetails?.gameType || 'N/A'}
+                      </div>
+                    </div>
+                    <div className="admin-stat-card glass-card">
+                      <h3>Total Staked</h3>
+                      <div className="admin-stat-value" style={{ fontSize: '1.5rem', color: 'var(--accent)' }}>
+                        ₹{(liveStats.roomDetails?.entryFee || 0) * (liveStats.roomDetails?.maxPlayers || 0)}
+                      </div>
+                    </div>
+                    <div className="admin-stat-card glass-card">
+                      <h3>Platform Rake</h3>
+                      <div className="admin-stat-value" style={{ fontSize: '1.5rem', color: 'var(--text-secondary)' }}>
+                        ₹{((liveStats.roomDetails?.entryFee || 0) * (liveStats.roomDetails?.maxPlayers || 0)) - (liveStats.roomDetails?.prizePool || 0)}
+                      </div>
                     </div>
                   </div>
-                  <div className="admin-stat-card glass-card">
-                    <h3>Active Players</h3>
-                    <div className="admin-stat-value">{liveStats.players.length}</div>
+                  
+                  <div style={{ textAlign: 'right', marginBottom: 'var(--space-md)', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                    <strong>Live Timestamp:</strong> {new Date().toLocaleString('en-IN')}
                   </div>
-                </div>
+
+                {liveStats.players && liveStats.players.length > 0 && (
+                  <div className="admin-transactions-section glass-card" style={{ marginBottom: 'var(--space-xl)', height: '300px', padding: 'var(--space-md)' }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={liveStats.players.map(p => ({ name: p.username, val: p.score !== undefined ? p.score : (p.gems !== undefined ? p.gems : (p.answersCount || 0)) }))} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
+                        <XAxis dataKey="name" stroke="var(--text-secondary)" tick={{ fill: 'var(--text-secondary)', fontSize: 12 }} />
+                        <YAxis stroke="var(--text-secondary)" tick={{ fill: 'var(--text-secondary)', fontSize: 12 }} />
+                        <Tooltip contentStyle={{ backgroundColor: 'rgba(18,20,20,0.9)', border: '1px solid var(--border-default)', borderRadius: '4px' }} itemStyle={{ color: 'var(--primary)' }} />
+                        <Bar dataKey="val" fill="var(--primary)" radius={[4, 4, 0, 0]}>
+                          {liveStats.players.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={index % 2 === 0 ? 'var(--primary)' : 'var(--accent)'} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+
                 <div className="admin-table-container">
                   <table className="admin-table">
                     <thead>
                       <tr>
                         <th>Player</th>
-                        {liveStats.players[0] && liveStats.players[0].answersCount !== undefined ? (
+                        {liveStats.players[0] && liveStats.players[0].gems !== undefined ? (
+                          <>
+                            <th>Gems Found</th>
+                            <th>Status</th>
+                          </>
+                        ) : liveStats.players[0] && liveStats.players[0].score !== undefined && liveStats.players[0].answersCount !== undefined ? (
+                          <>
+                            <th>Answers Submitted</th>
+                            <th>Current Score</th>
+                          </>
+                        ) : liveStats.players[0] && liveStats.players[0].answersCount !== undefined ? (
                           <th>Answers Submitted</th>
                         ) : (
                           <>
@@ -344,7 +396,17 @@ const AdminPage = () => {
                       {liveStats.players.map(p => (
                         <tr key={p.userId}>
                           <td style={{ fontWeight: 600 }}>{p.username}</td>
-                          {p.answersCount !== undefined ? (
+                          {p.gems !== undefined ? (
+                            <>
+                              <td className="admin-text-mono" style={{ color: 'var(--accent)' }}>{p.gems}</td>
+                              <td className="admin-text-mono">{p.status}</td>
+                            </>
+                          ) : p.score !== undefined && p.answersCount !== undefined ? (
+                            <>
+                              <td className="admin-text-mono">{p.answersCount}</td>
+                              <td className="admin-text-mono" style={{ color: 'var(--success)' }}>{p.score}</td>
+                            </>
+                          ) : p.answersCount !== undefined ? (
                             <td className="admin-text-mono">{p.answersCount}</td>
                           ) : (
                             <>
@@ -389,7 +451,7 @@ const AdminPage = () => {
                           <td>{formatDate(room.createdAt)}</td>
                           <td>
                             <div style={{ display: 'flex', gap: '8px' }}>
-                              {room.status === 'active' && (
+                              {(room.status === 'active' || room.status === 'playing' || room.status === 'countdown') && (
                                 <button className="btn btn--accent btn--sm" onClick={() => openLiveStats(room._id)}>Live Stats</button>
                               )}
                               <button className="btn btn--outline btn--sm" style={{ borderColor: 'var(--danger)', color: 'var(--danger)' }} onClick={() => handleEndRoom(room._id)}>End</button>

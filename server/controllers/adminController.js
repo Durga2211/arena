@@ -256,7 +256,7 @@ exports.getLiveRoomStats = async (req, res, next) => {
     const room = await Room.findById(roomId).populate('players.userId', 'username email avatar');
     if (!room) return res.status(404).json({ message: 'Room not found' });
 
-    if (room.status !== 'active') {
+    if (room.status !== 'active' && room.status !== 'playing' && room.status !== 'countdown') {
       return res.json({ success: true, status: room.status, message: 'Room is not active' });
     }
 
@@ -265,11 +265,13 @@ exports.getLiveRoomStats = async (req, res, next) => {
       const arena = activeShooterGames[roomId];
       
       if (!arena) {
-        return res.json({ success: true, status: room.status, message: 'Game state missing' });
+        const defaultPlayers = room.players.map(p => ({
+          userId: p.userId._id, username: p.userId.username, kills: 0, deaths: 0, score: 0
+        }));
+        return res.json({ success: true, status: room.status, timeRemaining: 0, players: defaultPlayers, roomDetails: { entryFee: room.entryFee, maxPlayers: room.maxPlayers, prizePool: room.prizePool, gameType: room.gameType } });
       }
 
       const playerStats = room.players.map(p => {
-        // Find player in arena by socket ID. The arena players map keys are socket IDs, but objects have userId
         const arenaPlayer = Object.values(arena.players).find(ap => ap.userId === p.userId._id.toString());
         return {
           userId: p.userId._id,
@@ -282,15 +284,51 @@ exports.getLiveRoomStats = async (req, res, next) => {
 
       return res.json({
         success: true,
+        status: room.status,
         timeRemaining: Math.floor(arena.timeRemaining),
         players: playerStats,
+        roomDetails: { entryFee: room.entryFee, maxPlayers: room.maxPlayers, prizePool: room.prizePool, gameType: room.gameType }
+      });
+    } else if (room.gameType === 'mines') {
+      const gameService = req.app.get('gameService');
+      const gameState = gameService?.activeMinesGames.get(roomId);
+
+      if (!gameState) {
+        const defaultPlayers = room.players.map(p => ({
+          userId: p.userId._id, username: p.userId.username, gems: 0, status: 'WAITING'
+        }));
+        return res.json({ success: true, status: room.status, timeRemaining: 0, players: defaultPlayers, roomDetails: { entryFee: room.entryFee, maxPlayers: room.maxPlayers, prizePool: room.prizePool, gameType: room.gameType } });
+      }
+
+      const timeRemaining = 30 - Math.floor((Date.now() - gameState.startTime) / 1000);
+
+      const playerStats = room.players.map(p => {
+        const result = gameState.results.get(p.userId._id.toString());
+        return {
+          userId: p.userId._id,
+          username: p.userId.username,
+          gems: result ? result.gems : 0,
+          status: result ? result.status : 'SURVIVED',
+        };
+      });
+
+      return res.json({
+        success: true,
+        status: room.status,
+        timeRemaining: timeRemaining > 0 ? timeRemaining : 0,
+        players: playerStats,
+        roomDetails: { entryFee: room.entryFee, maxPlayers: room.maxPlayers, prizePool: room.prizePool, gameType: room.gameType }
       });
     } else {
+      // Quiz
       const gameService = req.app.get('gameService');
       const gameState = gameService?.activeGames.get(roomId);
 
       if (!gameState) {
-        return res.json({ success: true, status: room.status, message: 'Game state missing' });
+        const defaultPlayers = room.players.map(p => ({
+          userId: p.userId._id, username: p.userId.username, answersCount: 0, score: 0
+        }));
+        return res.json({ success: true, status: room.status, timeRemaining: 0, players: defaultPlayers, roomDetails: { entryFee: room.entryFee, maxPlayers: room.maxPlayers, prizePool: room.prizePool, gameType: room.gameType } });
       }
 
       const timeRemaining = 60 - Math.floor((Date.now() - gameState.startTime) / 1000);
@@ -301,6 +339,11 @@ exports.getLiveRoomStats = async (req, res, next) => {
           userId: p.userId._id,
           username: p.userId.username,
           answersCount: answers.length,
+          score: answers.reduce((acc, ans) => {
+            const question = gameState.questions[ans.questionIndex];
+            if (question && question.correctAnswer === ans.answerIndex) return acc + 2;
+            return acc;
+          }, 0)
         };
       });
 

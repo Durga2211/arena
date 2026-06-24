@@ -60,12 +60,22 @@ const MinesPage = () => {
       setFinalResults(data);
     });
 
+    socket.on('game:tie-rematch', (data) => {
+      toast.error(data.message, { duration: 5000, icon: '⚔️' });
+      // Reset local game state
+      setGameStatus('WAITING');
+      setRevealed(new Array(25).fill(false));
+      setGemsFound(0);
+      setTimeRemaining(30);
+    });
+
     socket.emit('room:join', { roomId });
 
     return () => {
       socket.off('mines:start');
       socket.off('mines:update');
       socket.off('mines:end');
+      socket.off('game:tie-rematch');
     };
   }, [socket, roomId, user?.id, user?._id, user?.username, user?.avatar]);
 

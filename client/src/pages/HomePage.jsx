@@ -355,48 +355,7 @@ const HomePage = () => {
         )}
       </div>
 
-      {/* Recent Games */}
-      <div className="home__section-header">
-        <span className="home__section-icon" style={{ filter: 'grayscale(1)' }}>📋</span>
-        <h2>Recent Games</h2>
-        <button className="home__view-all">View All &gt;</button>
-      </div>
-      
-      <div className="home__recent-container glass-card">
-        {recentGames.length > 0 ? (
-          <table className="home__recent-table">
-            <thead>
-              <tr>
-                <th>GAME NAME</th>
-                <th>ENTRY FEE</th>
-                <th>PLAYERS</th>
-                <th>STATUS</th>
-                <th>PLAYED ON</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentGames.map((game, i) => (
-                <tr key={i}>
-                  <td>
-                    <div className="home__recent-game-name">
-                      {game.gameType === 'shooter' ? '🔫' : game.gameType === 'mines' ? '💣' : '🧠'}
-                      <span>{game.gameType === 'shooter' ? 'Shooter Arena' : game.gameType === 'mines' ? 'Mines Jackpot' : 'Quiz Match'}</span>
-                    </div>
-                  </td>
-                  <td>₹{game.entryFee}</td>
-                  <td>{game.playerCount || '-'} / {game.maxPlayers || '-'}</td>
-                  <td><span className="badge badge--success">Completed</span></td>
-                  <td>{new Date(game.date).toLocaleString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <div className="home__empty-state">
-            <p>No games played yet. Join the arena to get started!</p>
-          </div>
-        )}
-      </div>
+
       {/* Custom Mines Modal */}
       {showMinesModal && (
         <div className="modal-overlay animate-fadeIn" onClick={() => setShowMinesModal(false)}>

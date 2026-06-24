@@ -161,16 +161,20 @@ const LobbyPage = () => {
               <p style={{ margin: '0 0 var(--space-xs) 0', color: 'var(--text-secondary)', fontSize: 'var(--font-sm)', textTransform: 'uppercase', letterSpacing: '1px' }}>Duel Invite Code</p>
               <h2 style={{ margin: 0, fontSize: '2.5rem', letterSpacing: '4px', color: 'var(--text-primary)' }}>{room?.roomCode}</h2>
               <p style={{ margin: 'var(--space-xs) 0 0 0', fontSize: 'var(--font-xs)', color: 'var(--text-tertiary)' }}>Share this 4-character code with your opponent</p>
-              <button className="btn btn--outline btn--sm" style={{ borderColor: 'var(--danger)', color: 'var(--danger)', marginTop: 'var(--space-sm)' }} onClick={handleLeave}>
-                Cancel Duel
-              </button>
+              {room?.status === 'waiting' && countdown === null && (
+                <button className="btn btn--outline btn--sm" style={{ borderColor: 'var(--danger)', color: 'var(--danger)', marginTop: 'var(--space-sm)' }} onClick={handleLeave}>
+                  Cancel Duel
+                </button>
+              )}
             </div>
           ) : (
             <div className="lobby__room-code" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--space-md)' }}>
               ROOM: {room?.roomCode}
-              <button className="btn btn--outline btn--sm" style={{ borderColor: 'var(--danger)', color: 'var(--danger)' }} onClick={handleLeave}>
-                Leave Room
-              </button>
+              {room?.status === 'waiting' && countdown === null && (
+                <button className="btn btn--outline btn--sm" style={{ borderColor: 'var(--danger)', color: 'var(--danger)' }} onClick={handleLeave}>
+                  Leave Room
+                </button>
+              )}
             </div>
           )}
           <h1 className="lobby__title">{room?.isDuel ? '1v1 Duel Lobby' : 'Waiting for Players'}</h1>

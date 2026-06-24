@@ -72,12 +72,20 @@ const QuizPage = () => {
       navigate(`/results/${roomId}`, { state: { results: data } });
     });
 
+    socket.on('game:tie-rematch', (data) => {
+      toast.error(data.message, { duration: 5000, icon: '⚔️' });
+      // Reset local answers state
+      setAnswers({});
+      setCurrentQuestion(0);
+    });
+
     socket.emit('room:join', { roomId });
 
     return () => {
       socket.off('quiz:start');
       socket.off('quiz:tick');
       socket.off('quiz:end');
+      socket.off('game:tie-rematch');
     };
   }, [socket, roomId, navigate]);
 

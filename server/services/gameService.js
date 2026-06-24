@@ -204,6 +204,26 @@ class GameService {
       // Sort by score (desc), then by time taken (asc)
       scores.sort((a, b) => b.score - a.score || a.timeTaken - b.timeTaken);
 
+      // Check for Tie for 1st place
+      const isTie = scores.length >= 2 && scores[0].score === scores[1].score && scores[0].timeTaken === scores[1].timeTaken;
+
+      if (isTie) {
+        // Emit tie-rematch event to all players
+        this.io.to(roomId).emit('game:tie-rematch', { 
+          message: 'Tie for 1st Place! Sudden Death Rematch starting in 5 seconds...', 
+          countdown: 5 
+        });
+        
+        // Clean up current game state
+        this.activeGames.delete(roomId);
+        
+        // Start rematch after 5 seconds
+        setTimeout(() => {
+          this.startQuiz(roomId);
+        }, 5000);
+        return; // Halt prize distribution and room completion
+      }
+
       // Assign ranks
       scores.forEach((s, i) => { s.rank = i + 1; });
 
@@ -370,36 +390,50 @@ class GameService {
         return a.firstClickTime - b.firstClickTime; // Tertiary: Fastest first click wins tie
       });
 
+      // Check for Tie for 1st place
+      const isTie = scores.length >= 2 && 
+                    scores[0].gems === scores[1].gems &&
+                    scores[0].survivalTime === scores[1].survivalTime &&
+                    scores[0].firstClickTime === scores[1].firstClickTime;
+
+      if (isTie) {
+        // Emit tie-rematch event to all players
+        this.io.to(roomId).emit('game:tie-rematch', { 
+          message: 'Tie for 1st Place! Sudden Death Rematch starting in 5 seconds...', 
+          countdown: 5 
+        });
+        
+        // Clean up current game state
+        this.activeMinesGames.delete(roomId);
+        
+        // Start rematch after 5 seconds
+        setTimeout(() => {
+          this.startMinesGame(roomId);
+        }, 5000);
+        return; // Halt prize distribution and room completion
+      }
+
       scores.forEach((s, i) => { s.rank = i + 1; });
 
       const prizePool = room.isArena ? room.prizePool : (room.entryFee * room.players.length);
       let totalPrizesDistributed = 0;
 
       if (room.isArena) {
-        // Mixed-Bet Arena Mode: Winner gets 95% of dynamic pool, Platform gets 5%. Losers get nothing.
-        const winnerPrize = prizePool * 0.95;
+        // Mixed-Bet Arena Mode: Winner gets 75% of dynamic pool, Losers get 5%. Platform gets 20%.
+        const winnerPrize = prizePool * 0.75;
+        const loserPrize = prizePool * 0.05;
         for (let i = 0; i < scores.length; i++) {
           if (scores[i].rank === 1) {
             scores[i].prize = winnerPrize;
           } else {
-            scores[i].prize = 0;
+            scores[i].prize = loserPrize;
           }
           totalPrizesDistributed += scores[i].prize;
         }
       } else if (room.isDuel) {
         // Duel Prize Pool: Winner gets 1.5x entry fee, Loser gets 0.1x entry fee
-        // Check for an absolute tie (same gems, same survival, same click time)
-        const isTie = scores.length === 2 && 
-                      scores[0].gems === scores[1].gems &&
-                      scores[0].survivalTime === scores[1].survivalTime &&
-                      scores[0].firstClickTime === scores[1].firstClickTime;
-        
         for (let i = 0; i < scores.length; i++) {
-          if (isTie) {
-            scores[i].prize = room.entryFee; // Refund entry fee if exact tie
-          } else {
-            scores[i].prize = scores[i].rank === 1 ? (room.entryFee * 1.5) : (room.entryFee * 0.1);
-          }
+          scores[i].prize = scores[i].rank === 1 ? (room.entryFee * 1.5) : (room.entryFee * 0.1);
           totalPrizesDistributed += scores[i].prize;
         }
       } else {
