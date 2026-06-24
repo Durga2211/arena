@@ -97,6 +97,18 @@ exports.login = async (req, res, next) => {
 exports.getMe = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
+    
+    // Lazy migration for legacy accounts
+    if (user.winningsBalance === 0 && user.totalEarnings > 0 && user.walletBalance > 0) {
+      let newWinnings = user.totalEarnings;
+      if (newWinnings > user.walletBalance) {
+        newWinnings = user.walletBalance;
+      }
+      user.winningsBalance = newWinnings;
+      user.depositBalance = user.walletBalance - newWinnings;
+      await user.save();
+    }
+    
     res.json({
       success: true,
       user: {
