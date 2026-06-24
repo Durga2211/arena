@@ -37,6 +37,7 @@ exports.updateSettings = async (req, res, next) => {
       if (typeof enabledGames.minesJackpot === 'boolean') settings.enabledGames.minesJackpot = enabledGames.minesJackpot;
       if (typeof enabledGames.minesDuels === 'boolean') settings.enabledGames.minesDuels = enabledGames.minesDuels;
       if (typeof enabledGames.minesGlobalTimeline === 'boolean') settings.enabledGames.minesGlobalTimeline = enabledGames.minesGlobalTimeline;
+      if (typeof enabledGames.minesArena === 'boolean') settings.enabledGames.minesArena = enabledGames.minesArena;
     }
 
     if (minesGlobalConfig) {

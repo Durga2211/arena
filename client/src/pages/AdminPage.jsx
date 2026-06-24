@@ -518,6 +518,20 @@ const AdminPage = () => {
                   </button>
                 </div>
 
+                <div className="admin-config-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--space-md)', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
+                  <div>
+                    <h3 style={{ margin: '0 0 4px 0', fontSize: 'var(--font-md)' }}>📡 Mines Arena (Public)</h3>
+                    <p style={{ margin: 0, fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>Free-for-all Matchmaking.</p>
+                  </div>
+                  <button 
+                    className={`btn ${settings?.minesArena !== false ? 'btn--success' : 'btn--outline'}`}
+                    style={{ background: settings?.minesArena !== false ? '#00e5ff' : 'transparent', color: settings?.minesArena !== false ? '#000' : '', borderColor: settings?.minesArena !== false ? '#00e5ff' : '' }}
+                    onClick={() => handleToggleGame('minesArena', settings?.minesArena !== false)}
+                  >
+                    {settings?.minesArena !== false ? 'Enabled' : 'Disabled'}
+                  </button>
+                </div>
+
               </div>
 
               <h2 style={{ marginTop: 'var(--space-2xl)' }}>🌍 Mines Global Timeline Settings</h2>

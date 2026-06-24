@@ -24,6 +24,7 @@ import WelcomeRoomPage from './pages/WelcomeRoomPage';
 import ShooterPage from './pages/ShooterPage';
 import MinesPage from './pages/MinesPage';
 import MinesGlobalPage from './pages/MinesGlobalPage';
+import RadarMatchmaking from './pages/RadarMatchmaking';
 
 function App() {
   return (
@@ -76,6 +77,7 @@ function App() {
                 <Route path="/shooter/:roomId" element={<ProtectedRoute><ShooterPage /></ProtectedRoute>} />
                 <Route path="/mines/:roomId" element={<ProtectedRoute><MinesPage /></ProtectedRoute>} />
                 <Route path="/mines-global" element={<ProtectedRoute><MinesGlobalPage /></ProtectedRoute>} />
+                <Route path="/matchmaking" element={<ProtectedRoute><RadarMatchmaking /></ProtectedRoute>} />
 
                 {/* Protected Routes With Layout */}
                 <Route path="/welcome-room" element={<ProtectedRoute><AppLayout><WelcomeRoomPage /></AppLayout></ProtectedRoute>} />

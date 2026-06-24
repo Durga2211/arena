@@ -191,6 +191,28 @@ const MinesPage = () => {
           </div>
         )}
 
+        {/* RE-QUEUE TRAP MODAL */}
+        {gameStatus === 'ELIMINATED' && (
+          <div className="mines-modal-overlay" style={{ backdropFilter: 'blur(8px)', background: 'rgba(0,0,0,0.7)' }}>
+            <div className="mines-modal" style={{ border: '2px solid var(--danger)', boxShadow: '0 0 30px rgba(255,50,50,0.3)' }}>
+              <h1 className="lose" style={{ fontSize: '3rem', margin: '0 0 10px 0' }}>KABOOM! 💥</h1>
+              <p style={{ fontSize: '1.2rem', marginBottom: '2rem', color: 'var(--text-secondary)' }}>
+                You hit a mine at {gemsFound} gems. Don't let them take your spot on the leaderboard.
+              </p>
+              <button 
+                className="btn" 
+                style={{ background: 'var(--danger)', color: '#fff', fontSize: '1.2rem', padding: '15px 30px', width: '100%', textTransform: 'uppercase', fontWeight: 'bold', letterSpacing: '1px' }}
+                onClick={() => navigate('/matchmaking')}
+              >
+                GET REVENGE: REMATCH NOW!
+              </button>
+              <button className="btn btn--outline" style={{ marginTop: '15px', width: '100%', borderColor: 'transparent' }} onClick={() => navigate('/home')}>
+                Return to Lobby
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* FINISHED MODAL */}
         {gameStatus === 'FINISHED' && finalResults && (
           <div className="mines-modal-overlay">

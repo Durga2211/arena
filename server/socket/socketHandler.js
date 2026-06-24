@@ -1,10 +1,27 @@
 const jwt = require('jsonwebtoken');
 const Room = require('../models/Room');
 const GameService = require('../services/gameService');
-
+const MatchmakingHandler = require('./matchmakingHandler');
 
 const setupSocket = (io) => {
   const gameService = new GameService(io);
+  const matchmakingHandler = new MatchmakingHandler(io);
+
+  const broadcastStats = () => {
+    const onlineCount = io.engine.clientsCount;
+    let inRoomCount = 0;
+    io.sockets.sockets.forEach(s => {
+      if (s.currentRoom) inRoomCount++;
+    });
+    io.emit('stats:update', {
+      online: onlineCount,
+      inRoom: inRoomCount,
+      available: Math.max(0, onlineCount - inRoomCount)
+    });
+  };
+
+  // Broadcast global stats periodically as a fallback
+  setInterval(broadcastStats, 5000);
 
   // Socket authentication middleware
   io.use((socket, next) => {
@@ -24,6 +41,10 @@ const setupSocket = (io) => {
 
   io.on('connection', (socket) => {
     console.log(`User connected: ${socket.userId}`);
+    broadcastStats();
+
+    // Attach matchmaking events to this socket
+    matchmakingHandler.handleConnection(socket);
 
     // Join a room's socket channel
     socket.on('room:join', async ({ roomId }) => {
@@ -45,6 +66,7 @@ const setupSocket = (io) => {
 
         socket.join(roomId);
         socket.currentRoom = roomId;
+        broadcastStats();
 
         // Notify others
         const player = room.players.find(
@@ -127,6 +149,7 @@ const setupSocket = (io) => {
     socket.on('room:leave', async ({ roomId }) => {
       socket.leave(roomId);
       socket.currentRoom = null;
+      broadcastStats();
 
       try {
         const room = await Room.findById(roomId);
@@ -219,9 +242,11 @@ const setupSocket = (io) => {
       console.log(`User disconnected: ${socket.userId}`);
       if (socket.currentRoom) {
         socket.to(socket.currentRoom).emit('room:player-left', {
-          playerId: socket.userId,
+          playerId: socket.userId
         });
       }
+      matchmakingHandler.removeFromAllQueues(socket.id);
+      broadcastStats();
     });
   });
 

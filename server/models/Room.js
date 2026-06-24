@@ -23,6 +23,10 @@ const roomSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  isArena: {
+    type: Boolean,
+    default: false,
+  },
   status: {
     type: String,
     enum: ['waiting', 'countdown', 'active', 'completed', 'cancelled'],
@@ -33,6 +37,7 @@ const roomSchema = new mongoose.Schema({
     username: String,
     avatar: String,
     joinedAt: { type: Date, default: Date.now },
+    betAmount: { type: Number, default: 0 },
   }],
   questions: [{
     type: mongoose.Schema.Types.ObjectId,

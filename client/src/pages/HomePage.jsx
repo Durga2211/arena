@@ -20,6 +20,7 @@ const HomePage = () => {
   const [recentGames, setRecentGames] = useState([]);
   const [availableRooms, setAvailableRooms] = useState([]);
   const [enabledGames, setEnabledGames] = useState({ quiz: true, shooter: true, mines: true });
+  const [globalStats, setGlobalStats] = useState({ online: 0, inRoom: 0, available: 0 });
 
   // Custom Mines State
   const [showMinesModal, setShowMinesModal] = useState(false);
@@ -43,11 +44,15 @@ const HomePage = () => {
           setAvailableRooms((prev) => prev.filter(r => r.id !== data.roomId && r.id !== data.id));
         }
       });
+      socket.on('stats:update', (stats) => {
+        setGlobalStats(stats);
+      });
       
       return () => {
         socket.off('room:new');
         socket.off('room:update');
         socket.off('room:cancelled');
+        socket.off('stats:update');
       };
     }
   }, [socket]);
@@ -137,9 +142,20 @@ const HomePage = () => {
           <h1 className="home__greeting">
             Hey, <span>{user?.username}</span> <span className="home__wave">👋</span>
           </h1>
+          <div style={{ display: 'flex', gap: 'var(--space-md)', marginTop: 'var(--space-md)' }}>
+            <div style={{ background: 'rgba(0, 229, 255, 0.1)', padding: '5px 15px', borderRadius: '20px', border: '1px solid rgba(0, 229, 255, 0.3)', fontSize: '0.85rem', color: '#00e5ff' }}>
+              <span style={{ display: 'inline-block', width: '8px', height: '8px', background: '#00e5ff', borderRadius: '50%', marginRight: '5px', boxShadow: '0 0 5px #00e5ff' }}></span>
+              {globalStats.online} Online
+            </div>
+            <div style={{ background: 'rgba(0, 255, 100, 0.1)', padding: '5px 15px', borderRadius: '20px', border: '1px solid rgba(0, 255, 100, 0.3)', fontSize: '0.85rem', color: '#00ff64' }}>
+              {globalStats.available} Available
+            </div>
+            <div style={{ background: 'rgba(255, 100, 100, 0.1)', padding: '5px 15px', borderRadius: '20px', border: '1px solid rgba(255, 100, 100, 0.3)', fontSize: '0.85rem', color: '#ff6464' }}>
+              {globalStats.inRoom} In Game
+            </div>
+          </div>
         </div>
         <div className="home__hero-art">
-          {/* Using a big stylized icon block since we lack the specific asset */}
           <div className="home__hero-controller">🎮</div>
         </div>
       </div>
@@ -242,6 +258,22 @@ const HomePage = () => {
             </div>
             <div className="quick-play-card__action" style={{ color: '#00ff64' }}>
               <span>Host/Join</span>
+              <HiOutlineArrowRight />
+            </div>
+          </div>
+        )}
+
+        {enabledGames.minesArena !== false && (
+          <div className="quick-play-card" style={{ background: 'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)', border: '1px solid #00e5ff' }} onClick={() => navigate('/matchmaking')}>
+            <div className="quick-play-card__content">
+              <div className="quick-play-card__icon">📡</div>
+              <div className="quick-play-card__info">
+                <h3 style={{ color: '#00e5ff' }}>MINES ARENA</h3>
+                <p><span></span> Public Matchmaking</p>
+              </div>
+            </div>
+            <div className="quick-play-card__action" style={{ color: '#00e5ff' }}>
+              <span>Find Match</span>
               <HiOutlineArrowRight />
             </div>
           </div>

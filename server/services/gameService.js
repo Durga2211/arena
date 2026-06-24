@@ -372,10 +372,21 @@ class GameService {
 
       scores.forEach((s, i) => { s.rank = i + 1; });
 
-      const prizePool = room.entryFee * room.players.length;
+      const prizePool = room.isArena ? room.prizePool : (room.entryFee * room.players.length);
       let totalPrizesDistributed = 0;
 
-      if (room.isDuel) {
+      if (room.isArena) {
+        // Mixed-Bet Arena Mode: Winner gets 95% of dynamic pool, Platform gets 5%. Losers get nothing.
+        const winnerPrize = prizePool * 0.95;
+        for (let i = 0; i < scores.length; i++) {
+          if (scores[i].rank === 1) {
+            scores[i].prize = winnerPrize;
+          } else {
+            scores[i].prize = 0;
+          }
+          totalPrizesDistributed += scores[i].prize;
+        }
+      } else if (room.isDuel) {
         // Duel Prize Pool: Winner gets 1.5x entry fee, Loser gets 0.1x entry fee
         // Check for an absolute tie (same gems, same survival, same click time)
         const isTie = scores.length === 2 && 

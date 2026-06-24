@@ -12,7 +12,8 @@ const settingsSchema = new mongoose.Schema({
     mines: { type: Boolean, default: true }, // Legacy
     minesJackpot: { type: Boolean, default: true },
     minesDuels: { type: Boolean, default: true },
-    minesGlobalTimeline: { type: Boolean, default: true }
+    minesGlobalTimeline: { type: Boolean, default: true },
+    minesArena: { type: Boolean, default: true }
   },
   minesGlobalConfig: {
     entryFee: { type: Number, default: 50 },
