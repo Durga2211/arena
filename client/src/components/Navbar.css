@@ -9,10 +9,10 @@
   right: 0;
   height: 70px;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--bg-surface);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-bottom: 1px solid var(--border-default);
 }
 
 /* Subtle bottom glow line */
@@ -109,7 +109,24 @@
 
 .navbar__link--active {
   border-bottom: 2px solid var(--primary);
-  color: var(--primary);
+  color: var(--text-primary);
+}
+
+.navbar__theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  transition: all var(--transition-fast);
+}
+
+.navbar__theme-toggle:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
 }
 
 .navbar__right {
