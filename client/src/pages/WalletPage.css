@@ -180,4 +180,15 @@
   .wallet__balance-amount {
     font-size: var(--font-3xl);
   }
+  
+  .wallet__withdraw-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+}
+
+.wallet__withdraw-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: var(--space-sm);
 }

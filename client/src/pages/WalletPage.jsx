@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useWallet } from '../context/WalletContext';
+import { useAuth } from '../context/AuthContext';
 import { paymentAPI } from '../services/api';
 import toast from 'react-hot-toast';
 import './WalletPage.css';
@@ -8,6 +9,7 @@ const QUICK_AMOUNTS = [100, 200, 500, 1000, 2000, 5000];
 const TXN_ICONS = { deposit: '📥', entry_fee: '🎮', prize: '🏆', withdrawal: '📤' };
 
 const WalletPage = () => {
+  const { user } = useAuth();
   const { balance, depositBalance, winningsBalance, transactions, loadingTxns, fetchTransactions, refreshBalance, withdraw } = useWallet();
   const [addAmount, setAddAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
@@ -152,7 +154,10 @@ const WalletPage = () => {
               </div>
             </div>
             <div className="wallet__balance-card glass-card" style={{ borderColor: 'var(--success)' }}>
-              <div className="wallet__balance-label" style={{ color: 'var(--success)' }}>Winnings Balance <span style={{fontSize: '0.8rem', color: 'var(--text-secondary)'}}>(Withdrawable)</span></div>
+              <div className="wallet__balance-label" style={{ color: 'var(--success)', display: 'flex', justifyContent: 'space-between' }}>
+                <span>Winnings Balance <span style={{fontSize: '0.8rem', color: 'var(--text-secondary)'}}>(Withdrawable)</span></span>
+                <span style={{color: 'var(--text-tertiary)', fontSize: '0.8rem', textTransform: 'none', fontWeight: 500}}>Lifetime Earnings: ₹{(user?.totalEarnings || 0).toLocaleString('en-IN')}</span>
+              </div>
               <div className="wallet__balance-amount" style={{ color: 'var(--success)' }}>₹{(winningsBalance || 0).toLocaleString('en-IN')}</div>
               <div className="wallet__balance-actions">
                 <button className="btn btn--outline btn--sm" style={{ borderColor: 'var(--success)', color: 'var(--success)' }} onClick={() => document.getElementById('withdraw-input').focus()}>
@@ -200,7 +205,7 @@ const WalletPage = () => {
         {/* Withdraw */}
         <div className="wallet__action-card glass-card" style={{ marginBottom: 'var(--space-2xl)' }}>
           <h3>Withdraw to UPI</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: 'var(--space-sm)' }}>
+          <div className="wallet__withdraw-grid">
             <input
               id="withdraw-input"
               type="number"
