@@ -1,21 +1,28 @@
 .app-layout {
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
-  padding-top: 80px; /* navbar height */
+  background: var(--bg-primary);
+  padding-top: 64px; /* navbar height */
 }
 
 .app-main {
   flex: 1;
-  margin-left: 250px; /* sidebar width */
-  width: calc(100% - 250px);
-  min-height: calc(100vh - 80px);
-  padding-bottom: var(--space-2xl);
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-xl);
+  overflow-y: auto;
+  position: relative;
+  z-index: 1;
 }
 
 @media (max-width: 768px) {
+  .app-layout {
+    padding-top: 64px;
+  }
+
   .app-main {
-    margin-left: 0;
-    width: 100%;
-    padding-bottom: calc(70px + var(--space-2xl)); /* bottom-nav height + spacing */
+    padding-bottom: calc(70px + var(--space-xl));
   }
 }

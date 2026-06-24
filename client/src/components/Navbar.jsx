@@ -49,8 +49,13 @@ const Navbar = () => {
           SQUIZ<span style={{ color: 'var(--primary)' }}>.</span>
         </Link>
 
-        {/* Removed center nav for new layout */}
-        <div style={{ flex: 1 }}></div>
+        {/* Center Navigation Links for Desktop */}
+        <div className="navbar__center-nav">
+          <Link to="/home" className={`navbar__center-link ${isActive('/home') ? 'active' : ''}`} onClick={handleNavClick}>Home</Link>
+          <Link to="/leaderboard" className={`navbar__center-link ${isActive('/leaderboard') ? 'active' : ''}`} onClick={handleNavClick}>Leaderboard</Link>
+          <Link to="/wallet" className={`navbar__center-link ${isActive('/wallet') ? 'active' : ''}`} onClick={handleNavClick}>Wallet</Link>
+          <Link to="/profile" className={`navbar__center-link ${isActive('/profile') ? 'active' : ''}`} onClick={handleNavClick}>Profile</Link>
+        </div>
 
         <div className="navbar__right">
           <button className="navbar__theme-toggle" onClick={toggleTheme} aria-label="Toggle Theme">
@@ -83,28 +88,9 @@ const Navbar = () => {
                   <div style={{ fontSize: 'var(--font-xs)', color: 'var(--text-tertiary)' }}>{user.email}</div>
                 </div>
                 
-                {/* Mobile-only navigation links */}
-                <div className="navbar__dropdown-mobile-nav" style={{ display: 'none' }}>
-                  <Link to="/home" className="navbar__dropdown-item" onClick={(e) => { handleNavClick(e); setShowDropdown(false); }}>
-                    <HiOutlineHome /> Home
-                  </Link>
-                  <Link to="/leaderboard" className="navbar__dropdown-item" onClick={(e) => { handleNavClick(e); setShowDropdown(false); }}>
-                    <HiOutlineTrophy /> Leaderboard
-                  </Link>
-                  <div className="navbar__dropdown-divider"></div>
-                </div>
-
                 <Link to="/profile" className="navbar__dropdown-item" onClick={(e) => { handleNavClick(e); setShowDropdown(false); }}>
-                  <HiOutlineUser /> Profile
+                  <HiOutlineUser /> Profile Settings
                 </Link>
-                <Link to="/wallet" className="navbar__dropdown-item" onClick={(e) => { handleNavClick(e); setShowDropdown(false); }}>
-                  <HiOutlineWallet /> Wallet
-                </Link>
-                {user.role === 'admin' && (
-                  <Link to="/admin" className="navbar__dropdown-item" onClick={(e) => { handleNavClick(e); setShowDropdown(false); }}>
-                    <span style={{ fontSize: '1.2em', marginRight: 'var(--space-sm)' }}>🛡️</span> Admin
-                  </Link>
-                )}
                 <div className="navbar__dropdown-divider"></div>
                 <button className="navbar__dropdown-item navbar__dropdown-item--danger" onClick={handleLogout}>
                   <HiOutlineArrowRightOnRectangle /> Logout

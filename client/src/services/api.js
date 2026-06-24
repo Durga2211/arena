@@ -92,6 +92,7 @@ export const roomAPI = {
 // Leaderboard API
 export const leaderboardAPI = {
   getTop: () => api.get('/leaderboard'),
+  getGlobal: () => api.get('/leaderboard/global'),
 };
 
 export const paymentAPI = {

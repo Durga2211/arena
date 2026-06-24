@@ -38,7 +38,6 @@ function App() {
         <AuthProvider>
           <SocketProvider>
             <WalletProvider>
-              <Navbar />
               <Toaster
                 position="top-right"
                 toastOptions={{

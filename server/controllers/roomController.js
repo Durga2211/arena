@@ -488,7 +488,7 @@ exports.getGameHistory = async (req, res, next) => {
     })
       .sort({ completedAt: -1 })
       .limit(20)
-      .select('roomCode entryFee prizePool results completedAt players');
+      .select('roomCode entryFee prizePool results completedAt players gameType maxPlayers');
 
     const history = rooms.map((room) => {
       const userResult = room.results.find(
@@ -502,7 +502,9 @@ exports.getGameHistory = async (req, res, next) => {
         rank: userResult?.rank || '-',
         score: userResult?.score || 0,
         prize: userResult?.prize || 0,
-        date: room.completedAt,
+        date: room.completedAt || room._id.getTimestamp(),
+        gameType: room.gameType || 'quiz',
+        maxPlayers: room.maxPlayers || 10,
       };
     });
 

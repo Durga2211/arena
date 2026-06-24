@@ -1,22 +1,26 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700;800;900&display=swap');
 
 /* ═══════════════════════════════════════════════
-   DESIGN TOKENS — GAMING MONOCHROME THEME
+   DESIGN TOKENS — MINIMAL TECH THEME
    ═══════════════════════════════════════════════ */
 
 :root {
-  /* Colors - Light Theme */
-  --bg-primary: #fafafa;
-  --bg-secondary: #f0f0f0;
+  /* Colors - Light Theme (Fallback, but UI is primarily Dark) */
+  --bg-primary: #f4f5f5;
+  --bg-secondary: #eaeaec;
   --bg-surface: #ffffff;
   --bg-elevated: #ffffff;
   --bg-hover: #e4e4e7;
 
-  /* Brand — Red Accent */
-  --primary: #c92a2a;
-  --primary-light: #e03131;
-  --primary-dark: #b02525;
-  --primary-glow: rgba(201, 42, 42, 0.08);
+  /* Brand — Cyber Mint (Light Mode) */
+  --primary: #00b377;
+  --primary-light: #00cc88;
+  --primary-dark: #008055;
+  --primary-glow: rgba(0, 179, 119, 0.15);
+
+  /* Secondary Accent — Cyber Cyan */
+  --secondary: #00f0ff;
+  --secondary-glow: rgba(0, 240, 255, 0.15);
 
   /* Accent — Black */
   --accent: #111111;
@@ -24,35 +28,26 @@
   --accent-dark: #000000;
   --accent-glow: rgba(0, 0, 0, 0.06);
 
-  /* Gaming accent */
-  --neon: rgba(201, 42, 42, 0.9);
-  --neon-glow: 0 0 10px rgba(201, 42, 42, 0.15), 0 0 30px rgba(201, 42, 42, 0.05);
-  --neon-glow-strong: 0 0 15px rgba(201, 42, 42, 0.25), 0 0 45px rgba(201, 42, 42, 0.08);
-
   /* Semantic */
   --warning: #f59f00;
-  --warning-light: #fcc419;
   --danger: #ff4444;
-  --danger-light: #ff6b6b;
-  --success: #00cc66;
-  --info: #4488ff;
+  --success: #00ff9d;
+  --info: #00f0ff;
 
   /* Text */
   --text-primary: #111111;
-  --text-secondary: #555555;
+  --text-secondary: #666666;
   --text-tertiary: #888888;
   --text-inverse: #ffffff;
 
   /* Borders */
   --border-default: #e4e4e7;
   --border-hover: #d4d4d8;
-  --border-accent: rgba(201, 42, 42, 0.2);
-  --border-glow: rgba(201, 42, 42, 0.15);
 
   /* Cards */
   --glass-bg: #ffffff;
   --glass-bg-hover: #fafafa;
-  --glass-border: #e4e4e7;
+  --glass-border: rgba(0, 0, 0, 0.1);
   --glass-blur: 0px;
 
   /* Spacing */
@@ -62,25 +57,18 @@
   --space-lg: 1.5rem;
   --space-xl: 2rem;
   --space-2xl: 3rem;
-  --space-3xl: 4rem;
 
   /* Radius */
   --radius-sm: 4px;
-  --radius-md: 8px;
+  --radius-md: 8px; /* Standard Minimal Tech radius */
   --radius-lg: 12px;
   --radius-xl: 16px;
   --radius-full: 9999px;
 
-  /* Shadows — light theme */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
-  --shadow-glow: 0 4px 20px rgba(201, 42, 42, 0.05);
-  --shadow-accent-glow: 0 0 20px rgba(0, 0, 0, 0.05);
-
   /* Typography */
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-family-display: 'Orbitron', 'Inter', sans-serif;
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-family-display: 'Space Grotesk', sans-serif;
+  
   --font-xs: 0.75rem;
   --font-sm: 0.875rem;
   --font-md: 1rem;
@@ -88,25 +76,27 @@
   --font-xl: 1.25rem;
   --font-2xl: 1.5rem;
   --font-3xl: 2rem;
-  --font-4xl: 2.5rem;
-  --font-5xl: 3.5rem;
 
   /* Transitions */
   --transition-fast: 150ms ease;
   --transition-base: 250ms ease;
-  --transition-slow: 400ms ease;
-  --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* ═══════════════════════════════════════════════
-   DARK THEME TOKENS
+   DARK THEME TOKENS (DEFAULT)
    ═══════════════════════════════════════════════ */
 [data-theme="dark"] {
   --bg-primary: #0a0a0f;
-  --bg-secondary: #121218;
-  --bg-surface: #14141e;
-  --bg-elevated: #1a1a24;
-  --bg-hover: #22222e;
+  --bg-secondary: #000000;
+  --bg-surface: #121418;
+  --bg-elevated: #1a1d24;
+  --bg-hover: #22262f;
+
+  /* Brand — Neon Mint (Dark Mode) */
+  --primary: #00ff9d;
+  --primary-light: #33ffb1;
+  --primary-dark: #00cc7e;
+  --primary-glow: rgba(0, 255, 157, 0.15);
 
   --accent: #ffffff;
   --accent-light: #f0f0f0;
@@ -118,13 +108,13 @@
   --text-tertiary: #71717a;
   --text-inverse: #111111;
 
-  --border-default: rgba(255, 255, 255, 0.08);
+  --border-default: rgba(255, 255, 255, 0.1);
   --border-hover: rgba(255, 255, 255, 0.15);
 
-  --glass-bg: rgba(20, 20, 30, 0.7);
-  --glass-bg-hover: rgba(26, 26, 36, 0.8);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-blur: 12px;
+  --glass-bg: #1a1c1c;
+  --glass-bg-hover: #222525;
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-blur: 0px;
 
   --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.5);
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.6);
@@ -274,27 +264,31 @@ input, select, textarea {
   overflow: hidden;
 }
 
-/* Subtle top-edge light reflection */
+/* Subtle top-edge neon green reflection for active states */
 .glass-card::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.05), transparent);
+  height: 2px;
+  background: var(--primary);
+  opacity: 0;
+  transition: opacity var(--transition-base);
   pointer-events: none;
 }
 
 .glass-card:hover {
-  border-color: var(--border-hover);
-  box-shadow: var(--shadow-glow);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.glass-card:hover::before {
+  opacity: 1;
 }
 
 .glass-card--elevated {
   background: var(--bg-elevated);
   box-shadow: var(--shadow-md);
-  border-color: var(--border-hover);
 }
 
 /* ═══════════════════════════════════════════════
@@ -307,10 +301,10 @@ input, select, textarea {
   justify-content: center;
   gap: var(--space-sm);
   padding: 0.75rem 1.5rem;
-  border-radius: var(--radius-md);
-  font-weight: 600;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
   font-size: var(--font-sm);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   transition:
     transform var(--transition-fast),
@@ -319,63 +313,43 @@ input, select, textarea {
   white-space: nowrap;
   position: relative;
   overflow: hidden;
-}
-
-/* Shimmer on hover */
-.btn::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent);
-  transition: left 0.5s ease;
-}
-
-.btn:hover::after {
-  left: 100%;
+  font-family: var(--font-family-display);
 }
 
 .btn:active {
-  transform: scale(0.95);
+  transform: scale(0.98);
 }
 
-.btn--primary {
-  background: var(--accent-dark);
-  color: var(--text-inverse);
-}
-
-.btn--primary:hover {
-  box-shadow: var(--shadow-sm);
-  transform: translateY(-2px);
-}
-
-.btn--accent {
+.btn--primary, .btn--accent {
   background: var(--primary);
-  color: var(--text-inverse);
+  color: #000000;
 }
 
-.btn--accent:hover {
-  box-shadow: var(--shadow-sm);
-  transform: translateY(-2px);
+.btn--primary:hover, .btn--accent:hover {
+  box-shadow: 0 0 15px rgba(0, 255, 157, 0.3);
   background: var(--primary-light);
 }
 
 .btn--outline {
   background: transparent;
-  border: 1px solid var(--accent-dark);
+  border: 1px solid var(--border-default);
   color: var(--text-primary);
 }
 
 .btn--outline:hover {
-  background: rgba(0, 0, 0, 0.05);
-  border-color: var(--accent-dark);
+  border-color: var(--primary);
+  color: var(--primary);
+  box-shadow: 0 0 10px rgba(0, 255, 157, 0.1);
 }
 
 .btn--danger {
-  background: var(--danger);
-  color: white;
+  background: transparent;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+}
+
+.btn--danger:hover {
+  background: rgba(255, 68, 68, 0.1);
 }
 
 .btn--ghost {
@@ -384,8 +358,7 @@ input, select, textarea {
 }
 
 .btn--ghost:hover {
-  color: var(--text-primary);
-  background: var(--glass-bg-hover);
+  color: var(--primary);
 }
 
 .btn--sm {
@@ -439,8 +412,8 @@ input, select, textarea {
 }
 
 .input:focus {
-  border-color: var(--border-accent);
-  box-shadow: 0 0 0 3px rgba(201, 42, 42, 0.15);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
 }
 
 .input::placeholder {

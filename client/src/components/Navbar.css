@@ -1,35 +1,17 @@
 /* ═══════════════════════════════════════════════
-   NAVBAR — Gaming Theme
+   NAVBAR — Minimal Tech Theme
    ═══════════════════════════════════════════════ */
 
 .navbar {
-  position: fixed;
+  grid-area: navbar;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
-  height: 70px;
+  height: 64px;
   z-index: 100;
-  background: var(--bg-surface);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
+  background: rgba(18, 20, 20, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-default);
-}
-
-/* Subtle bottom glow line */
-.navbar::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(0, 0, 0, 0.03) 30%, 
-    rgba(0, 0, 0, 0.05) 50%, 
-    rgba(0, 0, 0, 0.03) 70%, 
-    transparent
-  );
 }
 
 .navbar__inner {
@@ -37,96 +19,54 @@
   align-items: center;
   justify-content: space-between;
   height: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 var(--space-lg);
+  width: 100%;
+  padding: 0 var(--space-xl);
 }
 
 .navbar__logo {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  font-size: var(--font-xl);
+  font-size: 1.5rem;
   font-weight: 800;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.02em;
   color: var(--text-primary);
   font-family: var(--font-family-display);
   transition: all var(--transition-base);
 }
 
 .navbar__logo:hover {
-  text-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  opacity: 0.8;
 }
 
-.navbar__logo-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-md);
-  background: var(--text-primary);
+.navbar__center-nav {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: var(--font-lg);
-  font-weight: 900;
-  color: var(--bg-primary);
-  font-family: var(--font-family-display);
-  position: relative;
+  gap: var(--space-xl);
+  height: 100%;
 }
 
-.navbar__logo-icon::after {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: inherit;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  animation: pulseGlow 3s infinite;
-}
-
-.navbar__nav {
+.navbar__center-link {
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
-}
-
-.navbar__link {
-  padding: 0.5rem 0.875rem;
-  border-radius: var(--radius-md);
+  height: 100%;
+  padding: 0 var(--space-xs);
+  color: var(--text-secondary);
+  font-weight: 600;
   font-size: var(--font-sm);
-  font-weight: 500;
-  color: var(--text-secondary);
-  transition: color var(--transition-fast), background var(--transition-fast);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-size: var(--font-xs);
-}
-
-.navbar__link:hover,
-.navbar__link--active {
-  color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.navbar__link--active {
-  border-bottom: 2px solid var(--primary);
-  color: var(--text-primary);
-}
-
-.navbar__theme-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  color: var(--text-secondary);
-  background: var(--bg-secondary);
+  letter-spacing: 0.05em;
   transition: all var(--transition-fast);
+  border-bottom: 2px solid transparent;
+  text-decoration: none;
 }
 
-.navbar__theme-toggle:hover {
+.navbar__center-link:hover {
   color: var(--text-primary);
-  background: var(--bg-hover);
+}
+
+.navbar__center-link.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
 }
 
 .navbar__right {
@@ -138,126 +78,119 @@
 .navbar__wallet {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  padding: 0.4rem 0.875rem;
-  background: rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: var(--radius-full);
-  color: var(--text-primary);
-  font-weight: 600;
-  font-size: var(--font-sm);
-  cursor: pointer;
-  transition: all var(--transition-base);
+  gap: var(--space-xs);
+  padding: 0.5rem 1rem;
+  background: var(--bg-hover);
+  border-radius: var(--radius-sm);
   font-family: var(--font-family-display);
-  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: background var(--transition-fast);
+  border: 1px solid var(--border-default);
 }
 
 .navbar__wallet:hover {
-  background: rgba(0, 0, 0, 0.06);
-  border-color: rgba(0, 0, 0, 0.1);
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
-}
-
-.navbar__wallet-icon {
-  font-size: var(--font-md);
-  transition: transform var(--transition-fast);
-}
-
-.navbar__wallet:hover .navbar__wallet-icon {
-  transform: scale(1.15) rotate(-10deg);
+  background: rgba(0, 255, 157, 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 .navbar__avatar {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 2px solid var(--primary); /* Neon stroke for online status */
+  padding: 2px;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--font-xs);
-  font-weight: 700;
   color: var(--text-primary);
+  font-weight: 600;
   cursor: pointer;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-  position: relative;
+  transition: transform var(--transition-fast);
 }
 
 .navbar__avatar:hover {
-  transform: scale(1.08);
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+  transform: scale(1.05);
 }
 
+.navbar__theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.navbar__theme-toggle:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* User Dropdown */
 .navbar__dropdown {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 10px);
   right: 0;
-  min-width: 200px;
-  background: var(--bg-elevated);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: var(--radius-lg);
+  width: 240px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
-  padding: var(--space-xs);
-  animation: fadeInScale 0.2s ease;
-  z-index: 200;
+  padding: 0.5rem 0;
+  animation: slideDown 0.2s ease;
+  z-index: 110;
 }
 
 .navbar__dropdown-item {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  width: 100%;
-  padding: 0.6rem 0.875rem;
-  border-radius: var(--radius-md);
-  font-size: var(--font-sm);
+  padding: 0.75rem 1rem;
   color: var(--text-secondary);
+  font-size: var(--font-sm);
+  font-weight: 500;
   transition: all var(--transition-fast);
-  text-align: left;
+  text-decoration: none;
 }
 
 .navbar__dropdown-item:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--bg-hover);
   color: var(--text-primary);
-}
-
-.navbar__dropdown-item--danger:hover {
-  color: var(--danger);
-  background: rgba(255, 68, 68, 0.06);
 }
 
 .navbar__dropdown-divider {
   height: 1px;
-  background: rgba(0, 0, 0, 0.06);
-  margin: var(--space-xs) 0;
+  background: var(--border-default);
+  margin: 0.25rem 0;
 }
 
-/* Mobile hamburger */
-.navbar__mobile-toggle {
-  display: none;
-  flex-direction: column;
-  gap: 4px;
-  cursor: pointer;
-  padding: 4px;
-}
-
-.navbar__mobile-toggle span {
-  width: 22px;
-  height: 2px;
-  background: var(--text-secondary);
-  border-radius: 2px;
-  transition: var(--transition-base);
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 768px) {
-  .navbar__nav {
-    display: none;
+  .navbar {
+    position: fixed;
   }
-
-  .navbar__mobile-toggle {
-    display: flex;
+  .navbar__inner {
+    padding: 0 var(--space-md);
   }
-
+  .navbar__logo {
+    font-size: 1.25rem;
+  }
+  .navbar__center-nav {
+    display: none; /* Hide on mobile, handled by bottom nav or dropdown */
+  }
+  .navbar__wallet {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.875rem;
+  }
   .navbar__dropdown-mobile-nav {
     display: block !important;
   }

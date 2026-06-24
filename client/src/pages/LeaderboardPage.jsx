@@ -57,7 +57,13 @@ const LeaderboardPage = () => {
                     </td>
                     <td>
                       <div className="leaderboard__player">
-                        <div className="leaderboard__avatar">{player.avatar}</div>
+                        <div className="leaderboard__avatar">
+                          {player.avatar?.startsWith('http') ? (
+                            <img src={player.avatar} alt="avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                          ) : (
+                            player.avatar
+                          )}
+                        </div>
                         {player.username}
                       </div>
                     </td>

@@ -1,9 +1,15 @@
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
+import { useEffect } from 'react';
+
 const ProfilePage = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, fetchUser } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
 
   const handleLogout = () => {
     logout();
@@ -25,7 +31,11 @@ const ProfilePage = () => {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 'var(--font-xl)', fontWeight: 800, color: 'white',
             }}>
-              {user?.avatar}
+              {user?.avatar?.startsWith('http') ? (
+                <img src={user.avatar} alt="avatar" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+              ) : (
+                user?.avatar
+              )}
             </div>
             <div>
               <h2 style={{ fontSize: 'var(--font-xl)', fontWeight: 700 }}>{user?.username}</h2>

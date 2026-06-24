@@ -1,11 +1,11 @@
-import Sidebar from './Sidebar';
+import Navbar from './Navbar';
 import BottomNav from './BottomNav';
 import './AppLayout.css';
 
 const AppLayout = ({ children }) => {
   return (
     <div className="app-layout">
-      <Sidebar />
+      <Navbar />
       <main className="app-main">
         {children}
       </main>

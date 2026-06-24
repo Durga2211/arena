@@ -24,15 +24,15 @@
   color: var(--text-tertiary);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-secondary);
   font-family: var(--font-family-display);
 }
 
 .leaderboard__table td {
   padding: 0.875rem var(--space-lg);
   font-size: var(--font-sm);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--border-default);
 }
 
 .leaderboard__table tr:last-child td {
@@ -40,7 +40,7 @@
 }
 
 .leaderboard__table tr:hover td {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-hover);
 }
 
 .leaderboard__rank {
@@ -63,8 +63,8 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
   display: flex;
   align-items: center;
   justify-content: center;

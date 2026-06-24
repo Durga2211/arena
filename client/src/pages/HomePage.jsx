@@ -385,7 +385,7 @@ const HomePage = () => {
                   <td>₹{game.entryFee}</td>
                   <td>{game.playerCount || '-'} / {game.maxPlayers || '-'}</td>
                   <td><span className="badge badge--success">Completed</span></td>
-                  <td>{new Date(game.createdAt).toLocaleString()}</td>
+                  <td>{new Date(game.date).toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>
