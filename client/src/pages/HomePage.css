@@ -469,6 +469,9 @@
 
   .home__greeting {
     justify-content: center;
+    font-size: var(--font-xl);
+    flex-wrap: wrap;
+    word-break: break-word;
   }
 
   .home__hero-controller {

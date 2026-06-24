@@ -142,15 +142,16 @@ const HomePage = () => {
           <h1 className="home__greeting">
             Hey, <span>{user?.username}</span> <span className="home__wave">👋</span>
           </h1>
-          <div style={{ display: 'flex', gap: 'var(--space-md)', marginTop: 'var(--space-md)' }}>
-            <div style={{ background: 'rgba(0, 229, 255, 0.1)', padding: '5px 15px', borderRadius: '20px', border: '1px solid rgba(0, 229, 255, 0.3)', fontSize: '0.85rem', color: '#00e5ff' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 'var(--space-md)', marginTop: 'var(--space-md)' }}>
+            <div style={{ background: 'rgba(0, 229, 255, 0.1)', padding: '5px 15px', borderRadius: '20px', border: '1px solid rgba(0, 229, 255, 0.3)', fontSize: '0.85rem', color: '#00e5ff', whiteSpace: 'nowrap' }}>
               <span style={{ display: 'inline-block', width: '8px', height: '8px', background: '#00e5ff', borderRadius: '50%', marginRight: '5px', boxShadow: '0 0 5px #00e5ff' }}></span>
               {globalStats.online} Online
             </div>
-            <div style={{ background: 'rgba(0, 255, 100, 0.1)', padding: '5px 15px', borderRadius: '20px', border: '1px solid rgba(0, 255, 100, 0.3)', fontSize: '0.85rem', color: '#00ff64' }}>
+            <div style={{ background: 'rgba(0, 255, 100, 0.1)', padding: '5px 15px', borderRadius: '20px', border: '1px solid rgba(0, 255, 100, 0.3)', fontSize: '0.85rem', color: '#00ff64', whiteSpace: 'nowrap' }}>
+              <span style={{ display: 'inline-block', width: '8px', height: '8px', background: '#00ff64', borderRadius: '50%', marginRight: '5px', boxShadow: '0 0 5px #00ff64' }}></span>
               {globalStats.available} Available
             </div>
-            <div style={{ background: 'rgba(255, 100, 100, 0.1)', padding: '5px 15px', borderRadius: '20px', border: '1px solid rgba(255, 100, 100, 0.3)', fontSize: '0.85rem', color: '#ff6464' }}>
+            <div style={{ background: 'rgba(255, 100, 100, 0.1)', padding: '5px 15px', borderRadius: '20px', border: '1px solid rgba(255, 100, 100, 0.3)', fontSize: '0.85rem', color: '#ff6464', whiteSpace: 'nowrap' }}>
               {globalStats.inRoom} In Game
             </div>
           </div>
