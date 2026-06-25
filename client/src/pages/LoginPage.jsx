@@ -13,7 +13,7 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  if (user) return <Navigate to="/welcome-room" replace />;
+  if (user) return <Navigate to="/home" replace />;
 
   const handleGoogleLogin = async () => {
     // Check Firebase configuration
@@ -35,7 +35,7 @@ const LoginPage = () => {
       const result = await signInWithPopup(auth, googleProvider);
       const token = await result.user.getIdToken();
       await googleLogin(token);
-      navigate('/welcome-room');
+      navigate('/home');
     } catch (err) {
       console.error('Google Auth Error:', err);
       
