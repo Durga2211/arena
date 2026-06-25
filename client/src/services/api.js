@@ -111,6 +111,8 @@ export const adminAPI = {
   getLiveRoomStats: (password, roomId) => api.get(`/admin/rooms/${roomId}/live`, { headers: { 'x-admin-password': password } }),
   getWithdrawals: (password) => api.get('/admin/withdrawals', { headers: { 'x-admin-password': password } }),
   approveWithdrawal: (password, id) => api.post(`/admin/withdrawals/${id}/approve`, {}, { headers: { 'x-admin-password': password } }),
+  getUsers: (password) => api.get('/admin/users', { headers: { 'x-admin-password': password } }),
+  getAllRooms: (password) => api.get('/admin/rooms/all', { headers: { 'x-admin-password': password } }),
 };
 
 export default api;

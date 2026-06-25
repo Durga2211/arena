@@ -237,12 +237,17 @@ const HomePage = () => {
             <div className="quick-play-card__content">
               <div className="quick-play-card__icon">💣💀</div>
               <div className="quick-play-card__info">
-                <h3>MINES JACKPOT</h3>
+                <h3>CUSTOM MATCH</h3>
                 <p><span></span> Custom Match</p>
               </div>
             </div>
-            <div className="quick-play-card__action">
-              <span>Play Now</span>
+            <div className="quick-play-card__rules" style={{ flex: 1, fontSize: '0.85rem', color: 'rgba(255,255,255,0.8)', lineHeight: '1.5', marginTop: '10px' }}>
+              <div style={{ marginBottom: '6px' }}><strong style={{ color: 'white', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Mode:</strong> Custom room (3-10 players). Creator sets fee.</div>
+              <div style={{ marginBottom: '6px' }}><strong style={{ color: 'white', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Winner:</strong> 50% of the total pool.</div>
+              <div><strong style={{ color: 'white', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Losers:</strong> 1% of the pool each.</div>
+            </div>
+            <div className="quick-play-card__action" style={{ background: 'rgba(255,255,255,0.1)', padding: '10px 15px', borderRadius: '8px', marginTop: '10px' }}>
+              <span>ENTER ROOM (Play Now)</span>
               <HiOutlineArrowRight />
             </div>
           </div>
@@ -257,8 +262,13 @@ const HomePage = () => {
                 <p><span></span> ₹50 Entry (1v1)</p>
               </div>
             </div>
-            <div className="quick-play-card__action" style={{ color: '#00ff64' }}>
-              <span>Host/Join</span>
+            <div className="quick-play-card__rules" style={{ flex: 1, fontSize: '0.85rem', color: 'rgba(255,255,255,0.8)', lineHeight: '1.5', marginTop: '10px' }}>
+              <div style={{ marginBottom: '6px' }}><strong style={{ color: '#00ff64', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Mode:</strong> 1v1 tactical face-off.</div>
+              <div style={{ marginBottom: '6px' }}><strong style={{ color: '#00ff64', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Winner:</strong> 75% of the total pool.</div>
+              <div><strong style={{ color: '#00ff64', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Loser:</strong> 5% of the total pool.</div>
+            </div>
+            <div className="quick-play-card__action" style={{ color: '#00ff64', background: 'rgba(0, 255, 100, 0.1)', padding: '10px 15px', borderRadius: '8px', marginTop: '10px' }}>
+              <span>ENTER ROOM (Host/Join)</span>
               <HiOutlineArrowRight />
             </div>
           </div>
@@ -273,8 +283,13 @@ const HomePage = () => {
                 <p><span></span> Public Matchmaking</p>
               </div>
             </div>
-            <div className="quick-play-card__action" style={{ color: '#00e5ff' }}>
-              <span>Find Match</span>
+            <div className="quick-play-card__rules" style={{ flex: 1, fontSize: '0.85rem', color: 'rgba(255,255,255,0.8)', lineHeight: '1.5', marginTop: '10px' }}>
+              <div style={{ marginBottom: '6px' }}><strong style={{ color: '#00e5ff', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Mode:</strong> Free-for-all public duel. Variable Entry (₹50 - ₹500).</div>
+              <div style={{ marginBottom: '6px' }}><strong style={{ color: '#00e5ff', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Winner:</strong> 75% of the total pool.</div>
+              <div><strong style={{ color: '#00e5ff', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>Losers:</strong> 1% of the total pool each.</div>
+            </div>
+            <div className="quick-play-card__action" style={{ color: '#00e5ff', background: 'rgba(0, 229, 255, 0.1)', padding: '10px 15px', borderRadius: '8px', marginTop: '10px' }}>
+              <span>ENTER ROOM (Find Match)</span>
               <HiOutlineArrowRight />
             </div>
           </div>

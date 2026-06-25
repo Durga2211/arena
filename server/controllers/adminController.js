@@ -69,6 +69,25 @@ exports.getAllTransactions = async (req, res, next) => {
   }
 };
 
+// Helper to calculate revenue for a given timeframe
+const calculateRevenue = async (sinceDate) => {
+  const matchCondition = { status: 'completed' };
+  if (sinceDate) matchCondition.createdAt = { $gte: sinceDate };
+
+  const entryFeeResult = await Transaction.aggregate([
+    { $match: { ...matchCondition, type: 'entry_fee' } },
+    { $group: { _id: null, total: { $sum: '$amount' } } }
+  ]);
+  const fees = entryFeeResult.length > 0 ? entryFeeResult[0].total : 0;
+
+  const prizeResult = await Transaction.aggregate([
+    { $match: { ...matchCondition, type: 'prize' } },
+    { $group: { _id: null, total: { $sum: '$amount' } } }
+  ]);
+  const prizes = prizeResult.length > 0 ? prizeResult[0].total : 0;
+  return fees - prizes;
+};
+
 // @desc    Get platform statistics
 // @route   GET /api/admin/stats
 exports.getPlatformStats = async (req, res, next) => {
@@ -93,8 +112,13 @@ exports.getPlatformStats = async (req, res, next) => {
     ]);
     const totalPrizes = prizeResult.length > 0 ? prizeResult[0].total : 0;
 
-    // Platform revenue roughly = Entry Fees - Prizes Distributed
     const platformRevenue = totalEntryFees - totalPrizes;
+
+    const now = new Date();
+    const revenue1H = await calculateRevenue(new Date(now.getTime() - 60 * 60 * 1000));
+    const revenue1D = await calculateRevenue(new Date(now.getTime() - 24 * 60 * 60 * 1000));
+    const revenue1W = await calculateRevenue(new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000));
+    const revenue1M = await calculateRevenue(new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000));
 
     res.json({
       success: true,
@@ -103,7 +127,11 @@ exports.getPlatformStats = async (req, res, next) => {
         totalDeposits,
         totalEntryFees,
         totalPrizes,
-        platformRevenue
+        platformRevenue,
+        revenue1H,
+        revenue1D,
+        revenue1W,
+        revenue1M
       }
     });
   } catch (error) {
@@ -353,6 +381,35 @@ exports.getLiveRoomStats = async (req, res, next) => {
         players: playerStats,
       });
     }
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get all users
+// @route   GET /api/admin/users
+exports.getUsers = async (req, res, next) => {
+  try {
+    const users = await User.find()
+      .select('-password')
+      .sort({ createdAt: -1 });
+
+    res.json({ success: true, users });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get all rooms history
+// @route   GET /api/admin/rooms/all
+exports.getAllRoomsHistory = async (req, res, next) => {
+  try {
+    const rooms = await Room.find()
+      .populate('players.userId', 'username email avatar')
+      .populate('results.userId', 'username email avatar')
+      .sort({ createdAt: -1 });
+
+    res.json({ success: true, rooms });
   } catch (error) {
     next(error);
   }

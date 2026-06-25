@@ -9,7 +9,10 @@ const AdminPage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [stats, setStats] = useState(null);
   const [transactions, setTransactions] = useState([]);
+  const [users, setUsers] = useState([]);
   const [activeRooms, setActiveRooms] = useState([]);
+  const [allRooms, setAllRooms] = useState([]);
+  const [selectedRoomDetails, setSelectedRoomDetails] = useState(null);
   const [withdrawals, setWithdrawals] = useState([]);
   const [settings, setSettings] = useState({ quiz: true, shooter: true, mines: true });
   const [minesGlobalConfig, setMinesGlobalConfig] = useState({ entryFee: 50, totalPlayers: 10, winnerPrizePercent: 50, loserPrizePercent: 1 });
@@ -54,16 +57,20 @@ const AdminPage = () => {
   const fetchDashboardData = async (pwd) => {
     try {
       setLoading(true);
-      const [statsRes, txnsRes, roomsRes, withdrawalsRes, settingsRes] = await Promise.all([
+      const [statsRes, txnsRes, roomsRes, withdrawalsRes, settingsRes, usersRes, allRoomsRes] = await Promise.all([
         adminAPI.getStats(pwd || password),
         adminAPI.getTransactions(pwd || password),
         adminAPI.getActiveRooms(pwd || password),
         adminAPI.getWithdrawals(pwd || password),
         adminAPI.getSettings(pwd || password),
+        adminAPI.getUsers(pwd || password),
+        adminAPI.getAllRooms(pwd || password),
       ]);
       setStats(statsRes.data.stats);
       setTransactions(txnsRes.data.transactions);
+      setUsers(usersRes.data.users);
       setActiveRooms(roomsRes.data.rooms);
+      setAllRooms(allRoomsRes.data.rooms);
       setWithdrawals(withdrawalsRes.data.withdrawals);
       if (settingsRes.data.settings?.enabledGames) {
         setSettings(settingsRes.data.settings.enabledGames);
@@ -150,7 +157,7 @@ const AdminPage = () => {
       setNewRoomMaxPlayers(10);
       setNewRoomGameType('quiz');
       fetchDashboardData(password);
-      setActiveTab('liverooms');
+      setActiveTab('rooms');
     } catch (error) {
       console.error('Error creating room:', error);
       toast.error(error.response?.data?.message || 'Failed to create room');
@@ -193,18 +200,30 @@ const AdminPage = () => {
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
+      second: '2-digit'
     });
+  };
+
+  const getGameModeName = (room) => {
+    if (room.gameType === 'mines') {
+      if (room.isArena) return 'Mines Arena';
+      if (room.isDuel) return 'Mines Duel';
+      return 'Custom Match';
+    }
+    if (room.gameType === 'quiz') return 'Quiz Match';
+    if (room.gameType === 'shooter') return 'Shooter Arena';
+    return room.gameType || 'N/A';
   };
 
   if (!isAuthenticated) {
     return (
-      <div className="admin-page admin-page--login">
-        <div className="admin-login-card glass-card">
-          <h2>🛡️ Admin Access</h2>
-          <p>Please enter the admin password</p>
-          <form onSubmit={handleLogin} className="admin-login-form">
-            <input type="password" className="input" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} autoFocus />
-            <button type="submit" className="btn btn--primary">Enter</button>
+      <div className="os-login-container">
+        <div className="os-login-box">
+          <h2 style={{ color: 'var(--os-accent)', letterSpacing: '2px', textTransform: 'uppercase' }}>SQUIZ_OS ACCESS</h2>
+          <p style={{ color: 'var(--os-text-muted)', marginBottom: 'var(--space-xl)' }}>SECURE CONNECTION REQUIRED</p>
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+            <input type="password" className="os-input" placeholder="ACCESS_KEY" value={password} onChange={(e) => setPassword(e.target.value)} autoFocus style={{ textAlign: 'center' }} />
+            <button type="submit" className="os-btn os-btn--accent">INITIALIZE</button>
           </form>
         </div>
       </div>
@@ -213,464 +232,522 @@ const AdminPage = () => {
 
   if (loading && !stats) {
     return (
-      <div className="admin-page admin-page--loading">
-        <div className="spinner"></div>
-        <p>Loading Dashboard...</p>
+      <div className="os-login-container">
+        <div className="os-telemetry" style={{ fontSize: '1.2rem', color: 'var(--os-accent)' }}>
+          <div className="os-dot"></div> CONNECTING TO NETWORK NODES...
+        </div>
       </div>
     );
   }
 
   return (
     <div className="admin-page">
-      <div className="container">
-        <header className="admin-header">
-          <h1>🛡️ Admin Dashboard</h1>
-          <p>Real-time platform overview and configuration</p>
-          <button className="btn btn--outline btn--sm" onClick={() => fetchDashboardData(password)} style={{ maxWidth: 200, margin: '0 auto' }}>
-            Refresh Data
-          </button>
+      <aside className="os-sidebar">
+        <div className="os-logo-container">
+          <h2 className="os-logo">SQUIZ_OS</h2>
+        </div>
+        <div className="os-platform-ctrl">
+          PLATFORM_CTRL<br/>
+          <span style={{fontSize: '0.6rem', color: '#555'}}>V2.0.4-STABLE</span>
+        </div>
+        <ul className="os-menu">
+          <li className={`os-menu-item ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>[01] Overview</li>
+          <li className={`os-menu-item ${activeTab === 'revenue' ? 'active' : ''}`} onClick={() => setActiveTab('revenue')}>[02] Revenue</li>
+          <li className={`os-menu-item ${activeTab === 'players' ? 'active' : ''}`} onClick={() => setActiveTab('players')}>[03] Players</li>
+          <li className={`os-menu-item ${activeTab === 'rooms' ? 'active' : ''}`} onClick={() => setActiveTab('rooms')}>[04] Rooms</li>
+          <li className={`os-menu-item ${activeTab === 'customrooms' ? 'active' : ''}`} onClick={() => setActiveTab('customrooms')}>[05] Create Room</li>
+          <li className={`os-menu-item ${activeTab === 'config' ? 'active' : ''}`} onClick={() => setActiveTab('config')}>[06] Game Config</li>
+          <li className={`os-menu-item ${activeTab === 'withdrawals' ? 'active' : ''}`} onClick={() => setActiveTab('withdrawals')}>
+            [07] Withdrawals
+            {withdrawals.length > 0 && <span className="os-badge os-badge--warning" style={{marginLeft: 'auto'}}>{withdrawals.length}</span>}
+          </li>
+        </ul>
+      </aside>
+
+      <main className="os-main-content">
+        <header className="os-topbar">
+          <div className="os-top-tabs">
+            <div className="os-top-tab active">REVENUE</div>
+            <div className="os-top-tab">ANALYTICS</div>
+            <div className="os-top-tab">OPERATIONS</div>
+          </div>
+          <div className="os-top-actions">
+            <div className="os-telemetry"><div className="os-dot"></div> TELEMETRY_FEED_ACTIVE // SYNCED</div>
+            <button className="os-btn os-btn--accent" onClick={() => fetchDashboardData(password)}>RELOAD_BUFFER</button>
+          </div>
         </header>
 
-        <div className="admin-tabs">
-          <button className={`admin-tab ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>Overview</button>
-          <button className={`admin-tab ${activeTab === 'liverooms' ? 'active' : ''}`} onClick={() => setActiveTab('liverooms')}>Live Rooms</button>
-          <button className={`admin-tab ${activeTab === 'customrooms' ? 'active' : ''}`} onClick={() => setActiveTab('customrooms')}>Create Room</button>
-          <button className={`admin-tab ${activeTab === 'config' ? 'active' : ''}`} onClick={() => setActiveTab('config')}>Game Config</button>
-          <button className={`admin-tab ${activeTab === 'withdrawals' ? 'active' : ''}`} onClick={() => setActiveTab('withdrawals')}>
-            Withdrawals
-            {withdrawals.length > 0 && <span className="admin-tab-badge">{withdrawals.length}</span>}
-          </button>
-        </div>
-
-        {activeTab === 'overview' && (
-          <div className="admin-tab-content animate-fadeInUp">
-            {stats && (
-              <div className="admin-stats-grid">
-                <div className="admin-stat-card glass-card">
-                  <h3>Total Users</h3>
-                  <div className="admin-stat-value">{stats.totalUsers}</div>
-                </div>
-                <div className="admin-stat-card glass-card">
-                  <h3>Total Deposits</h3>
-                  <div className="admin-stat-value admin-stat-value--positive">₹{stats.totalDeposits.toLocaleString('en-IN')}</div>
-                </div>
-                <div className="admin-stat-card glass-card">
-                  <h3>Entry Fees Collected</h3>
-                  <div className="admin-stat-value">₹{stats.totalEntryFees.toLocaleString('en-IN')}</div>
-                </div>
-                <div className="admin-stat-card glass-card">
-                  <h3>Platform Revenue</h3>
-                  <div className="admin-stat-value admin-stat-value--accent">₹{stats.platformRevenue.toLocaleString('en-IN')}</div>
-                </div>
+        <div className="os-content animate-fade">
+          
+          {activeTab === 'overview' && (
+            <>
+              <div className="os-page-title">
+                <h1>SYSTEM_OVERVIEW</h1>
+                <div className="os-telemetry" style={{color: 'var(--os-accent)'}}>DATA_SOURCE_023 // LATENCY: 14ms // UPTIME: 99.98%</div>
               </div>
-            )}
-            <div className="admin-transactions-section glass-card">
-              <h2>Recent Transactions</h2>
-              <div className="admin-table-container">
-                <table className="admin-table">
-                  <thead>
-                    <tr>
-                      <th>Date</th>
-                      <th>User</th>
-                      <th>Type</th>
-                      <th>Amount</th>
-                      <th>Status</th>
-                      <th>Order ID</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {transactions.length > 0 ? (
-                      transactions.map((txn) => (
-                        <tr key={txn._id}>
-                          <td>{formatDate(txn.createdAt)}</td>
-                          <td>
-                            <div className="admin-user-cell">
-                              <span className="admin-user-name">{txn.userId?.username || 'Unknown'}</span>
-                              <span className="admin-user-email">{txn.userId?.email || ''}</span>
-                            </div>
-                          </td>
-                          <td><span className={`admin-badge admin-badge--${txn.type}`}>{txn.type.replace('_', ' ').toUpperCase()}</span></td>
-                          <td className={['deposit', 'prize'].includes(txn.type) ? 'admin-text-positive' : 'admin-text-negative'}>₹{txn.amount}</td>
-                          <td><span className={`admin-status-dot admin-status--${txn.status}`}></span>{txn.status}</td>
-                          <td className="admin-text-mono">{txn.razorpayOrderId || '-'}</td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr><td colSpan="6" className="admin-empty-state">No transactions found</td></tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
 
-        {activeTab === 'liverooms' && (
-          <div className="admin-tab-content animate-fadeInUp">
-            {viewingLiveRoom && liveStats ? (
-              <div className="admin-transactions-section glass-card" style={{ marginBottom: 'var(--space-xl)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-md)' }}>
-                  <h2>Live Game Stats</h2>
-                  <button className="btn btn--outline btn--sm" onClick={closeLiveStats}>Close Stats</button>
+              {stats && (
+                <div className="os-stats-grid">
+                  <div className="os-stat-card">
+                    <h3>TOTAL_USERS</h3>
+                    <div className="os-stat-value">{stats.totalUsers}</div>
+                  </div>
+                  <div className="os-stat-card">
+                    <h3>TOTAL_DEPOSITS</h3>
+                    <div className="os-stat-value accent">₹{stats.totalDeposits.toLocaleString('en-IN')}</div>
+                  </div>
+                  <div className="os-stat-card">
+                    <h3>ENTRY_FEES_COLLECTED</h3>
+                    <div className="os-stat-value">₹{stats.totalEntryFees.toLocaleString('en-IN')}</div>
+                  </div>
+                  <div className="os-stat-card">
+                    <h3>PLATFORM_REVENUE (ALL TIME)</h3>
+                    <div className="os-stat-value accent">₹{stats.platformRevenue.toLocaleString('en-IN')}</div>
+                  </div>
                 </div>
-                  <div className="admin-stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
-                    <div className="admin-stat-card glass-card">
-                      <h3>Status</h3>
-                      <div className="admin-stat-value" style={{ color: liveStats.status === 'countdown' ? 'var(--warning)' : (liveStats.timeRemaining <= 10 ? 'var(--danger)' : 'var(--success)'), fontSize: '1.5rem' }}>
-                        {liveStats.status === 'countdown' ? 'COUNTDOWN' : (liveStats.timeRemaining + 's')}
-                      </div>
-                    </div>
-                    <div className="admin-stat-card glass-card">
-                      <h3>Active Players</h3>
-                      <div className="admin-stat-value" style={{ fontSize: '1.5rem' }}>{liveStats.players.length} / {liveStats.roomDetails?.maxPlayers || 0}</div>
-                    </div>
-                    <div className="admin-stat-card glass-card">
-                      <h3>Game Mode</h3>
-                      <div className="admin-stat-value" style={{ fontSize: '1.5rem', textTransform: 'capitalize' }}>
-                        {liveStats.roomDetails?.gameType || 'N/A'}
-                      </div>
-                    </div>
-                    <div className="admin-stat-card glass-card">
-                      <h3>Total Staked</h3>
-                      <div className="admin-stat-value" style={{ fontSize: '1.5rem', color: 'var(--accent)' }}>
-                        ₹{(liveStats.roomDetails?.entryFee || 0) * (liveStats.roomDetails?.maxPlayers || 0)}
-                      </div>
-                    </div>
-                    <div className="admin-stat-card glass-card">
-                      <h3>Platform Rake</h3>
-                      <div className="admin-stat-value" style={{ fontSize: '1.5rem', color: 'var(--text-secondary)' }}>
-                        ₹{((liveStats.roomDetails?.entryFee || 0) * (liveStats.roomDetails?.maxPlayers || 0)) - (liveStats.roomDetails?.prizePool || 0)}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div style={{ textAlign: 'right', marginBottom: 'var(--space-md)', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-                    <strong>Live Timestamp:</strong> {new Date().toLocaleString('en-IN')}
-                  </div>
+              )}
 
-                {liveStats.players && liveStats.players.length > 0 && (
-                  <div className="admin-transactions-section glass-card" style={{ marginBottom: 'var(--space-xl)', height: '300px', padding: 'var(--space-md)' }}>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={liveStats.players.map(p => ({ name: p.username, val: p.score !== undefined ? p.score : (p.gems !== undefined ? p.gems : (p.answersCount || 0)) }))} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
-                        <XAxis dataKey="name" stroke="var(--text-secondary)" tick={{ fill: 'var(--text-secondary)', fontSize: 12 }} />
-                        <YAxis stroke="var(--text-secondary)" tick={{ fill: 'var(--text-secondary)', fontSize: 12 }} />
-                        <Tooltip contentStyle={{ backgroundColor: 'rgba(18,20,20,0.9)', border: '1px solid var(--border-default)', borderRadius: '4px' }} itemStyle={{ color: 'var(--primary)' }} />
-                        <Bar dataKey="val" fill="var(--primary)" radius={[4, 4, 0, 0]}>
-                          {liveStats.players.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={index % 2 === 0 ? 'var(--primary)' : 'var(--accent)'} />
-                          ))}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                )}
-
-                <div className="admin-table-container">
-                  <table className="admin-table">
+              <div className="os-table-section">
+                <div className="os-table-header">
+                  <h2>LIVE_TRANSACTION_STREAM</h2>
+                  <span className="os-table-meta">AUTO-UPDATING EVERY 5S</span>
+                </div>
+                <div className="os-table-container">
+                  <table className="os-table">
                     <thead>
                       <tr>
-                        <th>Player</th>
-                        {liveStats.players[0] && liveStats.players[0].gems !== undefined ? (
-                          <>
-                            <th>Gems Found</th>
-                            <th>Status</th>
-                          </>
-                        ) : liveStats.players[0] && liveStats.players[0].score !== undefined && liveStats.players[0].answersCount !== undefined ? (
-                          <>
-                            <th>Answers Submitted</th>
-                            <th>Current Score</th>
-                          </>
-                        ) : liveStats.players[0] && liveStats.players[0].answersCount !== undefined ? (
-                          <th>Answers Submitted</th>
-                        ) : (
-                          <>
-                            <th>Kills</th>
-                            <th>Deaths</th>
-                            <th>Score</th>
-                          </>
-                        )}
+                        <th>TIMESTAMP</th>
+                        <th>TX_ID</th>
+                        <th>NODE / USER</th>
+                        <th>TYPE</th>
+                        <th>AMOUNT</th>
+                        <th>STATUS</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {liveStats.players.map(p => (
-                        <tr key={p.userId}>
-                          <td style={{ fontWeight: 600 }}>{p.username}</td>
-                          {p.gems !== undefined ? (
-                            <>
-                              <td className="admin-text-mono" style={{ color: 'var(--accent)' }}>{p.gems}</td>
-                              <td className="admin-text-mono">{p.status}</td>
-                            </>
-                          ) : p.score !== undefined && p.answersCount !== undefined ? (
-                            <>
-                              <td className="admin-text-mono">{p.answersCount}</td>
-                              <td className="admin-text-mono" style={{ color: 'var(--success)' }}>{p.score}</td>
-                            </>
-                          ) : p.answersCount !== undefined ? (
-                            <td className="admin-text-mono">{p.answersCount}</td>
-                          ) : (
-                            <>
-                              <td className="admin-text-mono" style={{ color: 'var(--success)' }}>{p.kills}</td>
-                              <td className="admin-text-mono" style={{ color: 'var(--danger)' }}>{p.deaths}</td>
-                              <td className="admin-text-mono" style={{ color: 'var(--accent)' }}>{p.score}</td>
-                            </>
-                          )}
-                        </tr>
-                      ))}
-                      {liveStats.players.length === 0 && (
-                        <tr><td colSpan="4" className="admin-empty-state">No players actively playing.</td></tr>
+                      {transactions.length > 0 ? (
+                        transactions.map((txn) => (
+                          <tr key={txn._id}>
+                            <td className="os-text-muted">{formatDate(txn.createdAt).split(', ')[1]}</td>
+                            <td>{txn.razorpayOrderId || txn._id.substring(0, 8).toUpperCase()}</td>
+                            <td>
+                              {txn.userId?.username || 'UNKNOWN'} <span className="os-text-muted">({txn.userId?.email || 'N/A'})</span>
+                            </td>
+                            <td><span className={`os-badge ${txn.type === 'deposit' ? 'os-badge--success' : ''}`}>{txn.type.toUpperCase()}</span></td>
+                            <td className={['deposit', 'prize'].includes(txn.type) ? 'os-text-accent' : 'os-text-danger'}>₹{txn.amount}</td>
+                            <td>
+                              <span className={`os-badge os-badge--${txn.status === 'success' || txn.status === 'completed' ? 'success' : (txn.status === 'failed' ? 'danger' : 'warning')}`}>
+                                {txn.status.toUpperCase()}
+                              </span>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr><td colSpan="6" style={{textAlign: 'center', padding: '20px', color: 'var(--os-text-muted)'}}>NO TRANSACTIONS DETECTED</td></tr>
                       )}
                     </tbody>
                   </table>
                 </div>
               </div>
-            ) : null}
+            </>
+          )}
 
-            <div className="admin-transactions-section glass-card">
-              <h2>Live Rooms Overview</h2>
-              <div className="admin-table-container">
-                <table className="admin-table">
+          {activeTab === 'revenue' && (
+            <>
+              <div className="os-page-title">
+                <h1>REVENUE_OVERVIEW</h1>
+                <div className="os-telemetry" style={{color: 'var(--os-accent)'}}>DATA_SOURCE_023 // UPTIME: 99.98%</div>
+              </div>
+              
+              {stats && (
+                <div className="os-stats-grid">
+                  <div className="os-stat-card">
+                    <h3>REVENUE (1 HOUR)</h3>
+                    <div className="os-stat-value accent">₹{stats.revenue1H?.toLocaleString('en-IN') || 0}</div>
+                  </div>
+                  <div className="os-stat-card">
+                    <h3>REVENUE (1 DAY)</h3>
+                    <div className="os-stat-value accent">₹{stats.revenue1D?.toLocaleString('en-IN') || 0}</div>
+                  </div>
+                  <div className="os-stat-card">
+                    <h3>REVENUE (1 WEEK)</h3>
+                    <div className="os-stat-value accent">₹{stats.revenue1W?.toLocaleString('en-IN') || 0}</div>
+                  </div>
+                  <div className="os-stat-card">
+                    <h3>REVENUE (1 MONTH)</h3>
+                    <div className="os-stat-value accent">₹{stats.revenue1M?.toLocaleString('en-IN') || 0}</div>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {activeTab === 'players' && (
+            <>
+              <div className="os-page-title">
+                <h1>PLAYER_DATABASE</h1>
+                <div className="os-telemetry">SYNC_ACTIVE</div>
+              </div>
+
+              <div className="os-table-section">
+                <div className="os-table-header">
+                  <h2>REGISTERED_NODES (PLAYERS)</h2>
+                </div>
+                <div className="os-table-container">
+                  <table className="os-table">
+                    <thead>
+                      <tr>
+                        <th>JOIN_DATE</th>
+                        <th>PLAYER_IDENTIFIER</th>
+                        <th>WALLET_BALANCE</th>
+                        <th>TOTAL_EARNINGS</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {users.length > 0 ? (
+                        users.map((u) => (
+                          <tr key={u._id}>
+                            <td className="os-text-muted">{formatDate(u.createdAt)}</td>
+                            <td>{u.username} <span className="os-text-muted">[{u.email}]</span></td>
+                            <td>₹{u.walletBalance || 0}</td>
+                            <td className="os-text-accent">₹{u.totalEarnings || 0}</td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr><td colSpan="4" style={{textAlign: 'center'}}>NO NODES FOUND</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
+          )}
+
+          {activeTab === 'rooms' && (
+            <>
+              <div className="os-page-title">
+                <h1>ROOM_TELEMETRY</h1>
+                <div className="os-telemetry">TRACKING_ACTIVE_MATCHES</div>
+              </div>
+              
+              <div className="os-stats-grid">
+                <div className="os-stat-card">
+                  <h3>CURRENTLY_PLAYING</h3>
+                  <div className="os-stat-value accent">
+                    {allRooms.filter(r => ['waiting', 'countdown', 'active'].includes(r.status)).length}
+                  </div>
+                </div>
+                <div className="os-stat-card">
+                  <h3>TOTAL_ROOMS_PLAYED</h3>
+                  <div className="os-stat-value accent">
+                    {allRooms.filter(r => ['completed', 'cancelled'].includes(r.status)).length}
+                  </div>
+                </div>
+              </div>
+
+              <div className="os-table-section">
+                <div className="os-table-header">
+                  <h2>ROOM_HISTORY_LOG</h2>
+                </div>
+                <div className="os-table-container">
+                  <table className="os-table">
+                    <thead>
+                      <tr>
+                        <th>ROOM_ID</th>
+                        <th>GAME_MODE</th>
+                        <th>STATUS</th>
+                        <th>PLAYERS</th>
+                        <th>POOL_MONEY</th>
+                        <th>CREATED_AT</th>
+                        <th>ACTION</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {allRooms.length > 0 ? (
+                        allRooms.map((room) => (
+                          <tr key={room._id}>
+                            <td className="os-text-muted">#{room.roomCode}</td>
+                            <td>{getGameModeName(room).toUpperCase()}</td>
+                            <td>
+                              <span className={`os-badge os-badge--${room.status === 'completed' ? 'success' : (['active', 'waiting', 'countdown'].includes(room.status) ? 'warning' : 'danger')}`}>
+                                {room.status.toUpperCase()}
+                              </span>
+                            </td>
+                            <td>{room.players?.length || 0} / {room.maxPlayers || 10}</td>
+                            <td className="os-text-accent">₹{room.prizePool || 0}</td>
+                            <td className="os-text-muted">{formatDate(room.createdAt).split(', ')[1]}</td>
+                            <td>
+                              <button className="os-btn os-btn--accent" onClick={() => setSelectedRoomDetails(room)}>INSPECT</button>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr><td colSpan="7" style={{textAlign: 'center'}}>NO ROOMS IN LOG</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
+          )}
+
+          {activeTab === 'customrooms' && (
+            <>
+              <div className="os-page-title">
+                <h1>ROOM_INITIALIZATION</h1>
+                <div className="os-telemetry">MANUAL_OVERRIDE</div>
+              </div>
+              
+              <div className="os-form">
+                <div className="os-table-header"><h2>CREATE_CUSTOM_ROOM</h2></div>
+                <form onSubmit={handleCreateRoom} style={{display: 'flex', flexDirection: 'column', gap: 'var(--space-md)'}}>
+                  <div className="os-input-group">
+                    <label>GAME_TYPE_SELECT</label>
+                    <select className="os-select" value={newRoomGameType} onChange={(e) => setNewRoomGameType(e.target.value)}>
+                      <option value="quiz">QUIZ GAME</option>
+                      <option value="shooter">SHOOTER ARENA</option>
+                      <option value="mines">MINES (GEMS & MINES)</option>
+                    </select>
+                  </div>
+                  <div className="os-input-group">
+                    <label>ENTRY_FEE (₹)</label>
+                    <input type="number" className="os-input" value={newRoomEntryFee} onChange={(e) => setNewRoomEntryFee(e.target.value)} required min="10" />
+                  </div>
+                  <div className="os-input-group">
+                    <label>MAXIMUM_NODES (PLAYERS)</label>
+                    <input type="number" className="os-input" value={newRoomMaxPlayers} onChange={(e) => setNewRoomMaxPlayers(e.target.value)} required min="2" max="100" />
+                  </div>
+                  <button type="submit" className="os-btn os-btn--accent" style={{ marginTop: 'var(--space-sm)' }} disabled={creatingRoom}>
+                    {creatingRoom ? 'INITIALIZING...' : 'EXECUTE_CREATION'}
+                  </button>
+                </form>
+              </div>
+            </>
+          )}
+
+          {activeTab === 'config' && (
+            <>
+              <div className="os-page-title">
+                <h1>SYSTEM_CONFIGURATION</h1>
+                <div className="os-telemetry">GLOBAL_VARIABLES</div>
+              </div>
+
+              <div className="os-table-section">
+                <div className="os-table-header">
+                  <h2>GAME_MODULE_TOGGLES</h2>
+                </div>
+                <div className="os-config-grid">
+                  <div className="os-config-item">
+                    <div>
+                      <h3>QUIZ_MATCH</h3>
+                      <p>Classic multiple-choice trivia.</p>
+                    </div>
+                    <button className={`os-btn ${settings?.quiz ? 'os-btn--accent' : ''}`} onClick={() => handleToggleGame('quiz', settings?.quiz)}>
+                      {settings?.quiz ? 'ENABLED' : 'DISABLED'}
+                    </button>
+                  </div>
+                  <div className="os-config-item">
+                    <div>
+                      <h3>SHOOTER_ARENA</h3>
+                      <p>Reflex-based target shooting.</p>
+                    </div>
+                    <button className={`os-btn ${settings?.shooter ? 'os-btn--accent' : ''}`} onClick={() => handleToggleGame('shooter', settings?.shooter)}>
+                      {settings?.shooter ? 'ENABLED' : 'DISABLED'}
+                    </button>
+                  </div>
+                  <div className="os-config-item">
+                    <div>
+                      <h3>MINES_JACKPOT</h3>
+                      <p>Standard Multiplayer Arena.</p>
+                    </div>
+                    <button className={`os-btn ${settings?.minesJackpot !== false ? 'os-btn--accent' : ''}`} onClick={() => handleToggleGame('minesJackpot', settings?.minesJackpot !== false)}>
+                      {settings?.minesJackpot !== false ? 'ENABLED' : 'DISABLED'}
+                    </button>
+                  </div>
+                  <div className="os-config-item">
+                    <div>
+                      <h3>MINES_DUELS</h3>
+                      <p>Private 1v1 Matches.</p>
+                    </div>
+                    <button className={`os-btn ${settings?.minesDuels !== false ? 'os-btn--accent' : ''}`} onClick={() => handleToggleGame('minesDuels', settings?.minesDuels !== false)}>
+                      {settings?.minesDuels !== false ? 'ENABLED' : 'DISABLED'}
+                    </button>
+                  </div>
+                  <div className="os-config-item">
+                    <div>
+                      <h3>GLOBAL_TIMELINE</h3>
+                      <p>Single-player Sync Mode.</p>
+                    </div>
+                    <button className={`os-btn ${settings?.minesGlobalTimeline !== false ? 'os-btn--accent' : ''}`} onClick={() => handleToggleGame('minesGlobalTimeline', settings?.minesGlobalTimeline !== false)}>
+                      {settings?.minesGlobalTimeline !== false ? 'ENABLED' : 'DISABLED'}
+                    </button>
+                  </div>
+                  <div className="os-config-item">
+                    <div>
+                      <h3>MINES_ARENA_PUBLIC</h3>
+                      <p>Free-for-all Matchmaking.</p>
+                    </div>
+                    <button className={`os-btn ${settings?.minesArena !== false ? 'os-btn--accent' : ''}`} onClick={() => handleToggleGame('minesArena', settings?.minesArena !== false)}>
+                      {settings?.minesArena !== false ? 'ENABLED' : 'DISABLED'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="os-table-section" style={{ marginTop: 'var(--space-2xl)' }}>
+                <div className="os-table-header">
+                  <h2>GLOBAL_TIMELINE_PARAMETERS</h2>
+                </div>
+                <form className="os-form" onSubmit={handleUpdateMinesGlobalConfig}>
+                  <div className="os-input-group">
+                    <label>ENTRY_FEE (₹)</label>
+                    <input type="number" className="os-input" value={minesGlobalConfig.entryFee} onChange={(e) => setMinesGlobalConfig({...minesGlobalConfig, entryFee: Number(e.target.value)})} required min="10" />
+                  </div>
+                  <div className="os-input-group">
+                    <label>SIMULATED_NODES_PER_ROOM</label>
+                    <input type="number" className="os-input" value={minesGlobalConfig.totalPlayers} onChange={(e) => setMinesGlobalConfig({...minesGlobalConfig, totalPlayers: Number(e.target.value)})} required min="2" max="100" />
+                  </div>
+                  <div className="os-input-group">
+                    <label>WINNER_PRIZE_ALLOCATION (%)</label>
+                    <input type="number" className="os-input" value={minesGlobalConfig.winnerPrizePercent} onChange={(e) => setMinesGlobalConfig({...minesGlobalConfig, winnerPrizePercent: Number(e.target.value)})} required min="0" max="100" />
+                  </div>
+                  <div className="os-input-group">
+                    <label>LOSER_CONSOLATION_ALLOCATION (%)</label>
+                    <input type="number" className="os-input" value={minesGlobalConfig.loserPrizePercent} onChange={(e) => setMinesGlobalConfig({...minesGlobalConfig, loserPrizePercent: Number(e.target.value)})} required min="0" max="100" />
+                  </div>
+                  <button type="submit" className="os-btn os-btn--accent" style={{ alignSelf: 'flex-start' }}>UPDATE_CONFIG</button>
+                </form>
+              </div>
+            </>
+          )}
+
+          {activeTab === 'withdrawals' && (
+            <>
+              <div className="os-page-title">
+                <h1>WITHDRAWAL_REQUESTS</h1>
+                <div className="os-telemetry">MANUAL_APPROVAL_REQUIRED</div>
+              </div>
+
+              <div className="os-table-section">
+                <div className="os-table-header">
+                  <h2>PENDING_TRANSACTIONS</h2>
+                </div>
+                <div className="os-table-container">
+                  <table className="os-table">
+                    <thead>
+                      <tr>
+                        <th>TIMESTAMP</th>
+                        <th>USER_IDENTIFIER</th>
+                        <th>AMOUNT</th>
+                        <th>UPI_ID</th>
+                        <th>PHONE</th>
+                        <th>ACTION</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {withdrawals.length > 0 ? (
+                        withdrawals.map((withdrawal) => (
+                          <tr key={withdrawal._id}>
+                            <td className="os-text-muted">{formatDate(withdrawal.createdAt)}</td>
+                            <td>{withdrawal.userId?.username || 'UNKNOWN'} <span className="os-text-muted">[{withdrawal.userId?.email || ''}]</span></td>
+                            <td className="os-text-danger">₹{withdrawal.amount}</td>
+                            <td>{withdrawal.upiId || '-'}</td>
+                            <td>{withdrawal.phone || '-'}</td>
+                            <td>
+                              <button className="os-btn os-btn--accent" onClick={() => handleApproveWithdrawal(withdrawal._id)}>AUTHORIZE</button>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr><td colSpan="6" style={{textAlign: 'center'}}>NO PENDING REQUESTS</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
+          )}
+
+        </div>
+      </main>
+
+      {/* Room Details Modal */}
+      {selectedRoomDetails && (
+        <div className="os-modal-overlay" onClick={() => setSelectedRoomDetails(null)}>
+          <div className="os-modal animate-fade" onClick={e => e.stopPropagation()}>
+            <div className="os-modal-header">
+              <h2>ROOM_INSPECTION_PORTAL [#{selectedRoomDetails.roomCode}]</h2>
+              <button className="os-btn" onClick={() => setSelectedRoomDetails(null)}>CLOSE_X</button>
+            </div>
+            
+            <div className="os-stats-grid" style={{ marginBottom: 'var(--space-xl)' }}>
+              <div className="os-stat-card">
+                <h3>TOTAL_PRIZE_POOL</h3>
+                <div className="os-stat-value accent">₹{selectedRoomDetails.prizePool || 0}</div>
+              </div>
+              <div className="os-stat-card">
+                <h3>PLATFORM_REVENUE</h3>
+                <div className="os-stat-value danger">₹{selectedRoomDetails.platformFee || 0}</div>
+              </div>
+              <div className="os-stat-card">
+                <h3>ENTRY_FEE</h3>
+                <div className="os-stat-value">
+                  {selectedRoomDetails.isArena ? 'VARIABLE' : `₹${selectedRoomDetails.entryFee || 0}`}
+                </div>
+              </div>
+              <div className="os-stat-card">
+                <h3>GAME_MODE</h3>
+                <div className="os-stat-value">{getGameModeName(selectedRoomDetails).toUpperCase()}</div>
+              </div>
+            </div>
+
+            <div className="os-table-section">
+              <div className="os-table-header">
+                <h2>PLAYER_RESULTS_LOG</h2>
+              </div>
+              <div className="os-table-container">
+                <table className="os-table">
                   <thead>
                     <tr>
-                      <th>Room ID</th>
-                      <th>Game Type</th>
-                      <th>Status</th>
-                      <th>Players / Max</th>
-                      <th>Created</th>
-                      <th>Actions</th>
+                      <th>RANK</th>
+                      <th>PLAYER_ID</th>
+                      <th>SCORE</th>
+                      <th>PRIZE_ALLOCATED</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {activeRooms.length > 0 ? (
-                      activeRooms.map((room) => (
-                        <tr key={room._id}>
-                          <td className="admin-text-mono">#{room.roomCode}</td>
-                          <td style={{ textTransform: 'capitalize' }}>{room.gameType || 'Quiz'}</td>
-                          <td><span className={`admin-badge admin-badge--${room.status === 'active' ? 'prize' : 'entry_fee'}`}>{room.status.toUpperCase()}</span></td>
-                          <td>{room.players?.length || 0} / {room.maxPlayers || 10}</td>
-                          <td>{formatDate(room.createdAt)}</td>
-                          <td>
-                            <div style={{ display: 'flex', gap: '8px' }}>
-                              {(room.status === 'active' || room.status === 'playing' || room.status === 'countdown') && (
-                                <button className="btn btn--accent btn--sm" onClick={() => openLiveStats(room._id)}>Live Stats</button>
-                              )}
-                              <button className="btn btn--outline btn--sm" style={{ borderColor: 'var(--danger)', color: 'var(--danger)' }} onClick={() => handleEndRoom(room._id)}>End</button>
-                            </div>
+                    {selectedRoomDetails.results && selectedRoomDetails.results.length > 0 ? (
+                      selectedRoomDetails.results.sort((a,b) => (a.rank || 99) - (b.rank || 99)).map((res, idx) => (
+                        <tr key={idx}>
+                          <td style={{ color: res.rank === 1 ? 'var(--os-accent)' : 'inherit' }}>
+                            {res.rank === 1 ? '> 1ST' : `${res.rank || '-'}TH`}
                           </td>
+                          <td>{res.username || (res.userId && res.userId.username) || 'UNKNOWN'}</td>
+                          <td>{res.score || 0}</td>
+                          <td className="os-text-accent">₹{res.prize || 0}</td>
                         </tr>
                       ))
                     ) : (
-                      <tr><td colSpan="5" className="admin-empty-state">No active rooms right now</td></tr>
+                      selectedRoomDetails.players && selectedRoomDetails.players.length > 0 ? (
+                        selectedRoomDetails.players.map((p, idx) => (
+                          <tr key={idx}>
+                            <td>-</td>
+                            <td>{p.username || (p.userId && p.userId.username) || 'UNKNOWN'}</td>
+                            <td>-</td>
+                            <td>-</td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr><td colSpan="4" style={{textAlign: 'center'}}>NO LOGS FOUND</td></tr>
+                      )
                     )}
                   </tbody>
                 </table>
               </div>
             </div>
           </div>
-        )}
-
-        {activeTab === 'customrooms' && (
-          <div className="admin-tab-content animate-fadeInUp">
-            <div className="admin-transactions-section glass-card" style={{ maxWidth: 500, margin: '0 auto' }}>
-              <h2>Create Custom Room</h2>
-              <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-lg)' }}>Generate a new room with customized settings for the players.</p>
-              
-              <form onSubmit={handleCreateRoom} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-                <div className="input-group">
-                  <label>Game Type</label>
-                  <select className="input" value={newRoomGameType} onChange={(e) => setNewRoomGameType(e.target.value)}>
-                    <option value="quiz">Quiz Game</option>
-                    <option value="shooter">Shooter Arena</option>
-                    <option value="mines">Mines (Gems & Mines)</option>
-                  </select>
-                </div>
-                <div className="input-group">
-                  <label>Entry Fee (₹)</label>
-                  <input type="number" className="input" value={newRoomEntryFee} onChange={(e) => setNewRoomEntryFee(e.target.value)} required min="10" />
-                </div>
-                <div className="input-group">
-                  <label>Max Players</label>
-                  <input type="number" className="input" value={newRoomMaxPlayers} onChange={(e) => setNewRoomMaxPlayers(e.target.value)} required min="2" max="100" />
-                </div>
-                <button type="submit" className="btn btn--primary" style={{ marginTop: 'var(--space-sm)' }} disabled={creatingRoom}>
-                  {creatingRoom ? 'Creating...' : 'Create Room'}
-                </button>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'config' && (
-          <div className="admin-tab-content animate-fadeInUp">
-            <div className="admin-transactions-section glass-card">
-              <h2>🎮 Global Game Configuration</h2>
-              <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-lg)' }}>
-                Enable or disable game modes across the entire platform. Disabled games will not appear on the home page, and players will not be able to join them.
-              </p>
-              
-              <div className="admin-config-grid" style={{ display: 'grid', gap: 'var(--space-md)' }}>
-                
-                {/* Quiz Game Toggle */}
-                <div className="admin-config-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--space-md)', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
-                  <div>
-                    <h3 style={{ margin: '0 0 4px 0', fontSize: 'var(--font-md)' }}>🧠 Quiz Match</h3>
-                    <p style={{ margin: 0, fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>Classic multiple-choice trivia matches.</p>
-                  </div>
-                  <button 
-                    className={`btn ${settings?.quiz ? 'btn--primary' : 'btn--outline'}`}
-                    onClick={() => handleToggleGame('quiz', settings?.quiz)}
-                  >
-                    {settings?.quiz ? 'Enabled' : 'Disabled'}
-                  </button>
-                </div>
-
-                {/* Shooter Toggle */}
-                <div className="admin-config-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--space-md)', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
-                  <div>
-                    <h3 style={{ margin: '0 0 4px 0', fontSize: 'var(--font-md)' }}>🔫 Shooter Arena</h3>
-                    <p style={{ margin: 0, fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>Reflex-based target shooting game.</p>
-                  </div>
-                  <button 
-                    className={`btn ${settings?.shooter ? 'btn--accent' : 'btn--outline'}`}
-                    onClick={() => handleToggleGame('shooter', settings?.shooter)}
-                  >
-                    {settings?.shooter ? 'Enabled' : 'Disabled'}
-                  </button>
-                </div>
-
-                <div className="admin-config-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--space-md)', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
-                  <div>
-                    <h3 style={{ margin: '0 0 4px 0', fontSize: 'var(--font-md)' }}>💣 Mines Jackpot</h3>
-                    <p style={{ margin: 0, fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>Standard Multiplayer Arena.</p>
-                  </div>
-                  <button 
-                    className={`btn ${settings?.minesJackpot !== false ? 'btn--success' : 'btn--outline'}`}
-                    style={{ background: settings?.minesJackpot !== false ? '#00ff64' : 'transparent', color: settings?.minesJackpot !== false ? '#000' : '' }}
-                    onClick={() => handleToggleGame('minesJackpot', settings?.minesJackpot !== false)}
-                  >
-                    {settings?.minesJackpot !== false ? 'Enabled' : 'Disabled'}
-                  </button>
-                </div>
-
-                <div className="admin-config-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--space-md)', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
-                  <div>
-                    <h3 style={{ margin: '0 0 4px 0', fontSize: 'var(--font-md)' }}>⚔️ Mines Duels</h3>
-                    <p style={{ margin: 0, fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>Private 1v1 Matches.</p>
-                  </div>
-                  <button 
-                    className={`btn ${settings?.minesDuels !== false ? 'btn--success' : 'btn--outline'}`}
-                    style={{ background: settings?.minesDuels !== false ? '#00ff64' : 'transparent', color: settings?.minesDuels !== false ? '#000' : '' }}
-                    onClick={() => handleToggleGame('minesDuels', settings?.minesDuels !== false)}
-                  >
-                    {settings?.minesDuels !== false ? 'Enabled' : 'Disabled'}
-                  </button>
-                </div>
-
-                <div className="admin-config-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--space-md)', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
-                  <div>
-                    <h3 style={{ margin: '0 0 4px 0', fontSize: 'var(--font-md)' }}>🌍 Global Timeline</h3>
-                    <p style={{ margin: 0, fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>Single-player Sync Mode.</p>
-                  </div>
-                  <button 
-                    className={`btn ${settings?.minesGlobalTimeline !== false ? 'btn--success' : 'btn--outline'}`}
-                    style={{ background: settings?.minesGlobalTimeline !== false ? '#d400ff' : 'transparent', color: settings?.minesGlobalTimeline !== false ? '#fff' : '', borderColor: settings?.minesGlobalTimeline !== false ? '#d400ff' : '' }}
-                    onClick={() => handleToggleGame('minesGlobalTimeline', settings?.minesGlobalTimeline !== false)}
-                  >
-                    {settings?.minesGlobalTimeline !== false ? 'Enabled' : 'Disabled'}
-                  </button>
-                </div>
-
-                <div className="admin-config-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--space-md)', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)' }}>
-                  <div>
-                    <h3 style={{ margin: '0 0 4px 0', fontSize: 'var(--font-md)' }}>📡 Mines Arena (Public)</h3>
-                    <p style={{ margin: 0, fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>Free-for-all Matchmaking.</p>
-                  </div>
-                  <button 
-                    className={`btn ${settings?.minesArena !== false ? 'btn--success' : 'btn--outline'}`}
-                    style={{ background: settings?.minesArena !== false ? '#00e5ff' : 'transparent', color: settings?.minesArena !== false ? '#000' : '', borderColor: settings?.minesArena !== false ? '#00e5ff' : '' }}
-                    onClick={() => handleToggleGame('minesArena', settings?.minesArena !== false)}
-                  >
-                    {settings?.minesArena !== false ? 'Enabled' : 'Disabled'}
-                  </button>
-                </div>
-
-              </div>
-
-              <h2 style={{ marginTop: 'var(--space-2xl)' }}>🌍 Mines Global Timeline Settings</h2>
-              <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-lg)' }}>
-                Configure the parameters for the continuous single-player global mode.
-              </p>
-              
-              <form onSubmit={handleUpdateMinesGlobalConfig} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-                <div className="input-group">
-                  <label>Entry Fee (₹)</label>
-                  <input type="number" className="input" value={minesGlobalConfig.entryFee} onChange={(e) => setMinesGlobalConfig({...minesGlobalConfig, entryFee: Number(e.target.value)})} required min="10" />
-                </div>
-                <div className="input-group">
-                  <label>Simulated Players per Room</label>
-                  <input type="number" className="input" value={minesGlobalConfig.totalPlayers} onChange={(e) => setMinesGlobalConfig({...minesGlobalConfig, totalPlayers: Number(e.target.value)})} required min="2" max="100" />
-                </div>
-                <div className="input-group">
-                  <label>Winner Prize (%)</label>
-                  <input type="number" className="input" value={minesGlobalConfig.winnerPrizePercent} onChange={(e) => setMinesGlobalConfig({...minesGlobalConfig, winnerPrizePercent: Number(e.target.value)})} required min="0" max="100" />
-                </div>
-                <div className="input-group">
-                  <label>Loser Consolation Prize (%)</label>
-                  <input type="number" className="input" value={minesGlobalConfig.loserPrizePercent} onChange={(e) => setMinesGlobalConfig({...minesGlobalConfig, loserPrizePercent: Number(e.target.value)})} required min="0" max="100" />
-                </div>
-                <button type="submit" className="btn btn--primary" style={{ alignSelf: 'flex-start' }}>Save Global Settings</button>
-              </form>
-
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'withdrawals' && (
-          <div className="admin-tab-content animate-fadeInUp">
-            <div className="admin-transactions-section glass-card">
-              <h2>Pending Withdrawals</h2>
-              <div className="admin-table-container">
-                <table className="admin-table">
-                  <thead>
-                    <tr>
-                      <th>Date</th>
-                      <th>User</th>
-                      <th>Amount</th>
-                      <th>UPI ID</th>
-                      <th>Phone Number</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {withdrawals.length > 0 ? (
-                      withdrawals.map((withdrawal) => (
-                        <tr key={withdrawal._id}>
-                          <td>{formatDate(withdrawal.createdAt)}</td>
-                          <td>
-                            <div className="admin-user-cell">
-                              <span className="admin-user-name">{withdrawal.userId?.username || 'Unknown'}</span>
-                              <span className="admin-user-email">{withdrawal.userId?.email || ''}</span>
-                            </div>
-                          </td>
-                          <td className="admin-text-negative" style={{ fontWeight: 'bold' }}>₹{withdrawal.amount}</td>
-                          <td className="admin-text-mono">{withdrawal.upiId || '-'}</td>
-                          <td className="admin-text-mono">{withdrawal.phone || '-'}</td>
-                          <td>
-                            <button className="btn btn--accent btn--sm" onClick={() => handleApproveWithdrawal(withdrawal._id)}>Approve</button>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr><td colSpan="6" className="admin-empty-state">No pending withdrawals</td></tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
-
-      </div>
+        </div>
+      )}
     </div>
   );
 };

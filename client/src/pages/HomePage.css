@@ -191,7 +191,9 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 180px;
+  min-height: 180px;
+  height: auto;
+  gap: var(--space-md);
   border-radius: var(--radius-xl);
   padding: var(--space-lg);
   cursor: pointer;
