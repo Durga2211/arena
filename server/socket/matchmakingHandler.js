@@ -13,8 +13,8 @@ class MatchmakingHandler {
     socket.on('queue:join', async ({ betAmount }) => {
       // Validate betAmount
       const bet = Number(betAmount);
-      if (isNaN(bet) || bet < 50 || bet > 250) {
-        socket.emit('error', { message: 'Bet must be between ₹50 and ₹250' });
+      if (isNaN(bet) || bet < 50 || bet > 500) {
+        socket.emit('error', { message: 'Bet must be between ₹50 and ₹500' });
         return;
       }
 

@@ -79,10 +79,18 @@ const RadarMatchmaking = () => {
       }, 1000);
     };
 
+    const handleError = (data) => {
+      toast.error(data.message || 'Error joining matchmaking queue');
+      setIsSearching(false);
+      setLogs(['Radar offline. Connection error.']);
+    };
+
     socket.on('queue:match_found', handleMatchFound);
+    socket.on('error', handleError);
 
     return () => {
       socket.off('queue:match_found', handleMatchFound);
+      socket.off('error', handleError);
     };
   }, [socket, navigate]);
 
