@@ -533,3 +533,60 @@
   background: var(--os-accent);
   margin: 0 auto var(--space-xl) auto;
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 900px) {
+  .admin-page {
+    flex-direction: column;
+  }
+  
+  .os-sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    border-right: none;
+    border-bottom: 1px solid var(--os-border);
+  }
+  
+  .os-menu {
+    flex-direction: row;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 10px;
+  }
+  
+  .os-menu-item {
+    border-left: none;
+    border-bottom: 3px solid transparent;
+  }
+  
+  .os-menu-item.active {
+    border-left: none;
+    border-bottom: 3px solid var(--os-accent);
+  }
+  
+  .os-topbar {
+    flex-direction: column;
+    height: auto;
+    padding: var(--space-md);
+    gap: var(--space-md);
+  }
+  
+  .os-top-tabs {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 10px;
+  }
+  
+  .os-content {
+    padding: var(--space-md);
+  }
+  
+  .os-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .os-config-grid {
+    grid-template-columns: 1fr;
+  }
+}

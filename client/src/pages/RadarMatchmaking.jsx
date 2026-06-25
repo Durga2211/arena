@@ -21,8 +21,8 @@ const RadarMatchmaking = () => {
   }, [logs]);
 
   const handleStartSearch = () => {
-    if (betAmount < 50 || betAmount > 250) {
-      toast.error('Bet must be between ₹50 and ₹250');
+    if (betAmount < 50 || betAmount > 500) {
+      toast.error('Bet must be between ₹50 and ₹500');
       return;
     }
     if (balance < betAmount) {
@@ -103,7 +103,7 @@ const RadarMatchmaking = () => {
               <input 
                 type="number" 
                 min="50" 
-                max="250" 
+                max="500" 
                 value={betAmount} 
                 onChange={(e) => setBetAmount(Number(e.target.value))}
                 className="input bet-input" 
